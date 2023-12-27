@@ -4,49 +4,82 @@ namespace MassLoot.Tests;
 [TestOf(typeof(CumulativeWeightTableTests))]
 public class CumulativeWeightTableTests
 {
-    [TestCase(0, "common_item")]
-    [TestCase(1, "legendary_item")]
+    [TestCase(0, 0)]
+    [TestCase(1, 1)]
     public void DropLegendaryItem(
         double randomNumber,
-        string expectedItemId
+        int expectedIndex
     )
     {
-        var cumulativeWeightTable = new CumulativeWeightTable(
-        [
+        List<LootItem> lootItems = [
             new("common_item", "999"),
             new("legendary_item", "1")
-        ]);
+        ];
 
-        var result = cumulativeWeightTable.Drop(randomNumber);
+        foreach (var lootItem in lootItems)
+        {
+            lootItem.Calculate(
+                new Dictionary<string, double>()
+            );
+        }
 
-        Assert.That(result.ItemId, Is.EqualTo(expectedItemId));
+        var cumulativeWeightTable =
+            new CumulativeWeightTable(
+                lootItems
+            );
+
+        var result = cumulativeWeightTable.SelectIndex(randomNumber);
+
+        Assert.That(result, Is.EqualTo(expectedIndex));
     }
 
     [Test]
     public void DropTheOnlyItem()
     {
-        var cumulativeWeightTable = new CumulativeWeightTable(
-        [
+        List<LootItem> lootItems = [
             new("common_item", "1")
-        ]);
+        ];
 
-        var result = cumulativeWeightTable.Drop(0.5d);
+        foreach (var lootItem in lootItems)
+        {
+            lootItem.Calculate(
+                new Dictionary<string, double>()
+            );
+        }
 
-        Assert.That(result.ItemId, Is.EqualTo("common_item"));
+        var cumulativeWeightTable =
+            new CumulativeWeightTable(
+                lootItems
+            );
+
+        var result = cumulativeWeightTable.SelectIndex(0.5d);
+
+        Assert.That(result, Is.EqualTo(0));
     }
 
     [Test]
     public void DropWithSmallWeight()
     {
-        var cumulativeWeightTable = new CumulativeWeightTable(
-        [
+        List<LootItem> lootItems = [
             new("item_1", "0"),
             new("item_2", "1"),
             new("item_3", "1"),
-        ]);
+        ];
 
-        var result = cumulativeWeightTable.Drop(0.000000024d);
+        foreach (var lootItem in lootItems)
+        {
+            lootItem.Calculate(
+                new Dictionary<string, double>()
+            );
+        }
 
-        Assert.That(result.ItemId, Is.EqualTo("item_2"));
+        var cumulativeWeightTable =
+            new CumulativeWeightTable(
+                lootItems
+            );
+
+        var result = cumulativeWeightTable.SelectIndex(0.000000024d);
+
+        Assert.That(result, Is.EqualTo(1));
     }
 }
