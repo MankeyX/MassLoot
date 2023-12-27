@@ -13,13 +13,19 @@ public class LootTable
         Dictionary<string, double> variables
     )
     {
-        _loot = loot;
+        _loot = loot.ToList();
         _variables = variables;
 
-        LinkVariablesToLootItems();
+        SortItemsByVariables();
         CalculateWeights();
+        LinkVariablesToLootItems();
 
         _cumulativeWeightTable = new CumulativeWeightTable(loot);
+    }
+
+    private void SortItemsByVariables()
+    {
+        _loot.Sort((item, _) => item.HasVariables ? 1 : 0);
     }
 
     /// <summary>

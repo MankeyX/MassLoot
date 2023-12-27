@@ -25,6 +25,9 @@ public record LootItem
             );
     }
 
+    public bool HasVariables
+        => _expression.HasVariables;
+
     /// <summary>
     /// Get the variables used in the weight expression.
     /// </summary>

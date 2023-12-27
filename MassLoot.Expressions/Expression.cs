@@ -4,6 +4,9 @@ internal record Expression(
     ExpressionTokens Tokens
 )
 {
+    public bool HasVariables
+        => Tokens.HasVariables;
+
     public double Calculate(
         IReadOnlyDictionary<string, double> variables
     )
@@ -31,7 +34,7 @@ internal record Expression(
                     CalculateOperation(operand, value1, value2)
                 );
             }
-            else if (token.IsVariable())
+            else if (token.IsVariable)
             {
                 if (!variables.TryGetValue(token.Token, out var value))
                 {
@@ -74,7 +77,7 @@ internal record Expression(
     public IEnumerable<string> GetVariables()
     {
         return Tokens
-            .Where(token => token.IsVariable())
+            .Where(token => token.IsVariable)
             .Select(token => token.Token);
     }
 };
