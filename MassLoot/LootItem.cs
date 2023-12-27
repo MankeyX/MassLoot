@@ -7,13 +7,9 @@ public record LootItem
     public string ItemId { get; }
     public string WeightExpression { get; }
 
-    private double? _weight;
-    public double Weight
-    {
-        get => _weight ??= Calculate();
-    }
+    public double Weight { get; private set; }
 
-    private Expression Expression { get; }
+    private readonly Expression _expression;
 
     public LootItem(
         string itemId,
@@ -23,14 +19,28 @@ public record LootItem
         ItemId = itemId;
         WeightExpression = weightExpression;
 
-        Expression =
+        _expression =
             ExpressionParser.Parse(
                 weightExpression
             );
     }
 
-    private double Calculate()
-    {
-        return Expression.Calculate();
-    }
+    /// <summary>
+    /// Get the variables used in the weight expression.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<string> GetVariables()
+        => _expression.GetVariables();
+
+    /// <summary>
+    /// Calculate the weight of the item.
+    /// The weight can then be retrieved with the <see cref="Weight"/> property.
+    /// </summary>
+    /// <param name="variables">
+    /// The variables to be made available to the expression.
+    /// </param>
+    public void Calculate(
+        IReadOnlyDictionary<string, double> variables
+    ) =>
+        Weight = _expression.Calculate(variables);
 }

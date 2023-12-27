@@ -21,7 +21,9 @@ public class ExpressionTests
         var expression = ExpressionParser.Parse(expressionToParse);
 
         Assert.That(
-            expression.Calculate(),
+            expression.Calculate(
+                new Dictionary<string, double>()
+            ),
             Is.EqualTo(expectedResult)
         );
     }
@@ -41,7 +43,9 @@ public class ExpressionTests
         var expression = ExpressionParser.Parse(expressionToParse);
 
         Assert.That(
-            expression.Calculate(),
+            expression.Calculate(
+                new Dictionary<string, double>()
+            ),
             Is.EqualTo(expectedResult)
         );
     }
