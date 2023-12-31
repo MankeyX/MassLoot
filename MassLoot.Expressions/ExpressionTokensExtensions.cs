@@ -17,26 +17,9 @@ internal static class ExpressionTokensExtensions
                     "An expression cannot be empty"
                 )
             );
-        }
 
-        if (tokens.First().IsOperator(out var startingOp) &&
-            startingOp != Operator.OpenParenthesis)
-        {
-            validations.Add(
-                new ValidationError(
-                    "An expression cannot begin with an operator"
-                )
-            );
-        }
-
-        if (tokens[^1].IsOperator(out var endingOp) &&
-            endingOp != Operator.ClosingParenthesis)
-        {
-            validations.Add(
-                new ValidationError(
-                    "An expression cannot end with an operator"
-                )
-            );
+            errors = validations.ToArray();
+            return false;
         }
 
         var openParenthesis = 0;
@@ -47,20 +30,28 @@ internal static class ExpressionTokensExtensions
             {
                 switch (op)
                 {
+                    case Operator.Add when i == 0:
+                        validations.Add(
+                            new ValidationError(
+                                $"An expression cannot begin with an operator: '{tokens}'"
+                            )
+                        );
+                        break;
                     case Operator.OpenParenthesis:
                         openParenthesis++;
                         break;
                     case Operator.ClosingParenthesis:
+                        closingParenthesis++;
+
                         if (closingParenthesis > openParenthesis)
                         {
                             validations.Add(
                                 new ValidationError(
-                                    "Closing parenthesis cannot be used before opening parenthesis"
+                                    $"Closing parenthesis cannot be used before opening parenthesis: '{tokens}'"
                                 )
                             );
                         }
 
-                        closingParenthesis++;
                         break;
                     default:
                     {
@@ -71,7 +62,7 @@ internal static class ExpressionTokensExtensions
                             {
                                 validations.Add(
                                     new ValidationError(
-                                        "Consecutive operators are not allowed"
+                                        $"Consecutive operators are not allowed: '{tokens}'"
                                     )
                                 );
                             }
@@ -87,7 +78,17 @@ internal static class ExpressionTokensExtensions
         {
             validations.Add(
                 new ValidationError(
-                    "Mismatched parenthesis in expression"
+                    $"Mismatched parenthesis in expression: '{tokens}'"
+                )
+            );
+        }
+
+        if (tokens[^1].IsOperator(out var endingOp) &&
+            endingOp != Operator.ClosingParenthesis)
+        {
+            validations.Add(
+                new ValidationError(
+                    $"An expression cannot end with an operator: '{tokens}'"
                 )
             );
         }

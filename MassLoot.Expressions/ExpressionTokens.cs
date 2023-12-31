@@ -33,4 +33,9 @@ internal record ExpressionTokens
     {
         return GetEnumerator();
     }
+
+    public override string ToString()
+    {
+        return string.Join(' ', _tokens.Select(x => x.Token));
+    }
 }
