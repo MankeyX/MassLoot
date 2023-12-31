@@ -13,6 +13,14 @@ public class LootTable
         Dictionary<string, double> variables
     )
     {
+        if (loot.Count == 0)
+        {
+            throw new ArgumentException(
+                "You cannot create a loot table with zero items.",
+                nameof(loot)
+            );
+        }
+
         _loot = loot.ToList();
         _variables = variables;
 

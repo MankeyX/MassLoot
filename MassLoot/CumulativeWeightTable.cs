@@ -8,6 +8,14 @@ public class CumulativeWeightTable
         List<LootItem> loot
     )
     {
+        if (loot.Count == 0)
+        {
+            throw new ArgumentException(
+                "You cannot create a cumulative weights-table with zero items.",
+                nameof(loot)
+            );
+        }
+
         _cumulativeWeights = new List<double>(loot.Count);
 
         var cumulativeWeight = 0d;

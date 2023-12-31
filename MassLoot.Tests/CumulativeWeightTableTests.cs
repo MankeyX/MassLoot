@@ -4,6 +4,16 @@ namespace MassLoot.Tests;
 [TestOf(typeof(CumulativeWeightTableTests))]
 public class CumulativeWeightTableTests
 {
+    [Test]
+    public void EmptyTableThrowsException()
+    {
+        Assert.Throws<ArgumentException>(
+            () => new CumulativeWeightTable(
+                new()
+            )
+        );
+    }
+
     [TestCase(0, 0)]
     [TestCase(1, 1)]
     public void DropLegendaryItem(
