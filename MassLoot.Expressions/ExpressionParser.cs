@@ -12,7 +12,7 @@ internal static partial class ExpressionParser
         { Operator.Divide, 2 },
         { Operator.Exponentiate, 3 }
     };
-    private static readonly char[] Separator = { ' ' };
+    private static readonly char[] Separator = [' '];
 
     public static Expression Parse(string expression)
     {
@@ -46,7 +46,7 @@ internal static partial class ExpressionParser
                             operators.Pop();
                             break;
                         default:
-                            // Does op have a higher precedance than token[0]?
+                            // Does op have a higher precedence than token[0]?
                             if (operators.TryPeek(out var opToken) &&
                                 OrderOfOperations.TryGetValue(opToken.Operator, out var op1Precedence) &&
                                 OrderOfOperations.TryGetValue(@operator, out var op2Precedence) &&
@@ -74,8 +74,9 @@ internal static partial class ExpressionParser
         }
         else
         {
-            throw new InvalidOperationException(
-                string.Join("\\n", errors.Select(x => x.Message))
+            throw new InvalidExpressionException(
+                string.Join("\\n", errors.Select(x => x.Message)),
+                errors
             );
         }
 

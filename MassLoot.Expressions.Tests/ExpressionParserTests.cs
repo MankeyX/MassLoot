@@ -137,41 +137,26 @@ public class ExpressionParserTests
     }
 
     [Test]
-    public void ParseMismatchedParentheses()
-    {
-        const string expressionToParse = "5 + ( 3 - 2";
-
-        Assert.Throws<InvalidOperationException>(
-            () => ExpressionParser.Parse(expressionToParse)
-        );
-    }
-
-    [Test]
-    public void ParseConsecutiveOperators()
-    {
-        const string expressionToParse = "5 + + 3";
-
-        Assert.Throws<InvalidOperationException>(
-            () => ExpressionParser.Parse(expressionToParse)
-        );
-    }
-
-    [Test]
     public void ParseStartingWithOperator()
     {
         const string expressionToParse = "+ 5 + 3";
 
-        Assert.Throws<InvalidOperationException>(
+        Assert.Throws<InvalidExpressionException>(
             () => ExpressionParser.Parse(expressionToParse)
         );
     }
 
-    [Test]
-    public void ParseEndingWithOperator()
+    [TestCase("")]
+    [TestCase("5 + + 3")]
+    [TestCase("5 + ( 3 - 2")]
+    [TestCase("5 + 3 +")]
+    public void ThrowsInvalidExpressionException(
+        string expression
+    )
     {
-        const string expressionToParse = "5 + 3 +";
+        const string expressionToParse = "";
 
-        Assert.Throws<InvalidOperationException>(
+        Assert.Throws<InvalidExpressionException>(
             () => ExpressionParser.Parse(expressionToParse)
         );
     }

@@ -5,7 +5,6 @@ namespace MassLoot;
 public record LootItem
 {
     public string ItemId { get; }
-    public string WeightExpression { get; }
 
     public double Weight { get; private set; }
 
@@ -17,7 +16,6 @@ public record LootItem
     )
     {
         ItemId = itemId;
-        WeightExpression = weightExpression;
 
         _expression =
             ExpressionParser.Parse(
