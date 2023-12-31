@@ -56,6 +56,9 @@ public class CumulativeWeightTable
     /// <summary>
     /// Selects the index of the item to drop based on the specified number.
     /// </summary>
+    /// <returns>
+    /// The index of the item that was selected.
+    /// </returns>
     public int SelectIndex(
         double number
     )

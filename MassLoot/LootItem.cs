@@ -29,7 +29,9 @@ public record LootItem
     /// <summary>
     /// Get the variables used in the weight expression.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// The variables used in the weight expression.
+    /// </returns>
     public IEnumerable<string> GetVariables()
         => _expression.GetVariables();
 

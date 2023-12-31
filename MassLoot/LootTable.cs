@@ -31,6 +31,9 @@ public class LootTable
         _cumulativeWeightTable = new CumulativeWeightTable(loot);
     }
 
+    /// <summary>
+    /// Sort the items in the table by whether they have variables or not.
+    /// </summary>
     private void SortItemsByVariables()
     {
         _loot.Sort((item, _) => item.HasVariables ? 1 : 0);
@@ -111,6 +114,9 @@ public class LootTable
     /// <summary>
     /// Drop an item from the table based on the specified number.
     /// </summary>
+    /// <returns>
+    /// The item that was dropped.
+    /// </returns>
     public LootItem Drop(
         double number
     )
