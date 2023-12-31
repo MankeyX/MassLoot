@@ -23,7 +23,7 @@ internal record Expression(
             {
                 if (stack.Count < 2)
                 {
-                    throw new InvalidOperationException(
+                    throw new NotEnoughOperandsException(
                         $"Not enough operands for operator {token}"
                     );
                 }
@@ -38,7 +38,7 @@ internal record Expression(
             {
                 if (!variables.TryGetValue(token.Token, out var value))
                 {
-                    throw new InvalidOperationException(
+                    throw new VariableNotDefinedException(
                         $"Variable '{token.Token}' is not defined"
                     );
                 }
@@ -49,7 +49,7 @@ internal record Expression(
 
         if (stack.Count != 1)
         {
-            throw new InvalidOperationException(
+            throw new MalformedExpressionException(
                 "The expression is malformed."
             );
         }

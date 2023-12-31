@@ -49,4 +49,56 @@ public class ExpressionTests
             Is.EqualTo(expectedResult)
         );
     }
+
+    [Test]
+    public void CalculateThrowsVariableNotDefinedException()
+    {
+        var expression = ExpressionParser.Parse("test_var");
+
+        Assert.Throws<VariableNotDefinedException>(
+            () => expression.Calculate(
+                new Dictionary<string, double>()
+            )
+        );
+    }
+
+    [Test]
+    public void CalculateThrowsNotEnoughOperandsException()
+    {
+        var expression =
+            new Expression(
+                new ExpressionTokens(
+                [
+                    new ExpressionToken("1"),
+                    new ExpressionToken("+")
+                ])
+            );
+
+        Assert.Throws<NotEnoughOperandsException>(
+            () => expression.Calculate(
+                new Dictionary<string, double>()
+            )
+        );
+    }
+
+    [Test]
+    public void CalculateThrowsMalformedExpressionException()
+    {
+        var expression =
+            new Expression(
+                new ExpressionTokens(
+                [
+                    new ExpressionToken("1"),
+                    new ExpressionToken("2"),
+                    new ExpressionToken("+"),
+                    new ExpressionToken("1")
+                ])
+            );
+
+        Assert.Throws<MalformedExpressionException>(
+            () => expression.Calculate(
+                new Dictionary<string, double>()
+            )
+        );
+    }
 }
