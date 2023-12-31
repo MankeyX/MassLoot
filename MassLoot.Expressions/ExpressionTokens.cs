@@ -7,9 +7,15 @@ internal record ExpressionTokens
 {
     private readonly List<ExpressionToken> _tokens;
 
+    /// <summary>
+    /// The number of tokens in the expression.
+    /// </summary>
     public int Count
         => _tokens.Count;
 
+    /// <summary>
+    /// Indicates whether the expression contains variables.
+    /// </summary>
     public bool HasVariables { get; }
 
     public ExpressionToken this[int index]

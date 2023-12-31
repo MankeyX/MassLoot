@@ -4,9 +4,30 @@ internal record Expression(
     ExpressionTokens Tokens
 )
 {
+    /// <summary>
+    /// Whether the expression contains variables.
+    /// </summary>
     public bool HasVariables
         => Tokens.HasVariables;
 
+    /// <summary>
+    /// Calculate the value of the expression.
+    /// </summary>
+    /// <param name="variables">
+    /// The variables to be made available to the expression.
+    /// </param>
+    /// <returns>
+    /// The value of the expression.
+    /// </returns>
+    /// <exception cref="NotEnoughOperandsException">
+    /// Thrown when there are not enough operands for an operator.
+    /// </exception>
+    /// <exception cref="VariableNotDefinedException">
+    /// Thrown when a variable is not defined in <paramref name="variables"/>.
+    /// </exception>
+    /// <exception cref="MalformedExpressionException">
+    /// Thrown when the expression is malformed.
+    /// </exception>
     public double Calculate(
         IReadOnlyDictionary<string, double> variables
     )
@@ -74,6 +95,12 @@ internal record Expression(
         };
     }
 
+    /// <summary>
+    /// Get the variables used in the expression.
+    /// </summary>
+    /// <returns>
+    /// The variables used in the expression.
+    /// </returns>
     public IEnumerable<string> GetVariables()
     {
         return Tokens

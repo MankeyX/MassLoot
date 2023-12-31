@@ -14,6 +14,18 @@ internal static partial class ExpressionParser
     };
     private static readonly char[] Separator = [' '];
 
+    /// <summary>
+    /// Parses the expression into an <see cref="Expression"/> object.
+    /// </summary>
+    /// <param name="expression">
+    /// The expression to parse.
+    /// </param>
+    /// <returns>
+    /// The parsed expression.
+    /// </returns>
+    /// <exception cref="InvalidExpressionException">
+    /// Thrown when the expression cannot be parsed.
+    /// </exception>
     public static Expression Parse(string expression)
     {
         var operators = new Stack<ExpressionToken>();
@@ -87,6 +99,12 @@ internal static partial class ExpressionParser
         );
     }
 
+    /// <summary>
+    /// Tokenizes the expression by using two regexes to space out and split the expression into tokens.
+    /// </summary>
+    /// <returns>
+    /// The tokenized expression.
+    /// </returns>
     private static ExpressionTokens Tokenize(
         string expression
     )
@@ -125,9 +143,15 @@ internal static partial class ExpressionParser
             );
     }
 
+    /// <summary>
+    /// Matches negative numbers that are not preceded by an operator.
+    /// </summary>
     [GeneratedRegex(@"(?<=[ \^\-\*\+\(\/])(-(?:\w+))")]
     private static partial Regex NegativeNumbersRegex();
 
+    /// <summary>
+    /// Matches operators.
+    /// </summary>
     [GeneratedRegex(@"([\^\*\+\(\)\/])|(?<=[\w|\)])(-)")]
     private static partial Regex OperatorRegex();
 }
