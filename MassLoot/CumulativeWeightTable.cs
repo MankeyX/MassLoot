@@ -5,7 +5,7 @@ public class CumulativeWeightTable
     private readonly List<double> _cumulativeWeights;
 
     public CumulativeWeightTable(
-        List<LootItem> loot
+        IReadOnlyCollection<LootItem> loot
     )
     {
         if (loot.Count == 0)

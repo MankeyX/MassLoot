@@ -9,8 +9,8 @@ public class LootTable
     private readonly CumulativeWeightTable _cumulativeWeightTable;
 
     public LootTable(
-        List<LootItem> loot,
-        Dictionary<string, double> variables
+        IReadOnlyCollection<LootItem> loot,
+        IReadOnlyDictionary<string, double> variables
     )
     {
         if (loot.Count == 0)
@@ -22,7 +22,7 @@ public class LootTable
         }
 
         _loot = loot.ToList();
-        _variables = variables;
+        _variables = variables.ToDictionary();
 
         SortItemsByVariables();
         CalculateWeights();

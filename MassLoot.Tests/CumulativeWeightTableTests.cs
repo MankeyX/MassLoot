@@ -9,7 +9,7 @@ public class CumulativeWeightTableTests
     {
         Assert.Throws<ArgumentException>(
             () => new CumulativeWeightTable(
-                new()
+                new List<LootItem>()
             )
         );
     }

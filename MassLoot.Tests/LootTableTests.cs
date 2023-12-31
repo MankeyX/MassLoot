@@ -9,8 +9,8 @@ public class LootTableTests
     {
         Assert.Throws<ArgumentException>(
             () => new LootTable(
-                new(),
-                new()
+                new List<LootItem>(),
+                new Dictionary<string, double>()
             )
         );
     }
@@ -23,7 +23,7 @@ public class LootTableTests
                 [
                     new("item_1", "1")
                 ],
-                new()
+                new Dictionary<string, double>()
             );
 
         var result = lootTable.Drop(0.5d);
@@ -40,7 +40,7 @@ public class LootTableTests
                     new("item_1", "1"),
                     new("item_2", "1 + test_var")
                 ],
-                new()
+                new Dictionary<string, double>
                 {
                     { "test_var", 0d }
                 }
@@ -67,7 +67,7 @@ public class LootTableTests
                     new("item_1", "1"),
                     new("item_2", "1")
                 ],
-                new()
+                new Dictionary<string, double>()
             );
 
         var item1 = lootTable.Drop(0.5d);
@@ -91,7 +91,7 @@ public class LootTableTests
                     new("item_1", "1 + test_var"),
                     new("item_2", "1"),
                 ],
-                new()
+                new Dictionary<string, double>
                 {
                     { "test_var", 0d }
                 }
