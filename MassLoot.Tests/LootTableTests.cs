@@ -21,7 +21,7 @@ public class LootTableTests
     }
 
     [Test]
-    public void DropOneItemAfterUpdatingvariable()
+    public void DropOneItemAfterUpdatingVariable()
     {
         var lootTable =
             new LootTable(
