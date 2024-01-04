@@ -104,4 +104,49 @@ public class LootTableTests
             Assert.That(item1.ItemId, Is.EqualTo("item_1"));
         });
     }
+
+    [Test]
+    public void EmptyTableAsLootItemThrowsException()
+    {
+        Assert.Throws<ArgumentException>(
+            () => new LootTable(
+                string.Empty,
+                "4+4",
+                new List<LootItem>(),
+                new Dictionary<string, double>()
+            )
+        );
+    }
+
+    [Test]
+    public void DropItemFromNestedLootTable()
+    {
+        var lootTable =
+            new LootTable(
+                [
+                    new LootItem("item_1", "1"),
+                    new LootTable(
+                        "table_2",
+                        "1",
+                        [
+                            new LootItem("item_2", "1"),
+                            new LootItem("item_3", "1")
+                        ],
+                        new Dictionary<string, double>()
+                    )
+                ],
+                new Dictionary<string, double>()
+            );
+
+        var item1 = lootTable.Drop(0.49d);
+        var item2 = lootTable.Drop(0.51d);
+        var item3 = lootTable.Drop(0.76d);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(item1.ItemId, Is.EqualTo("item_1"));
+            Assert.That(item2.ItemId, Is.EqualTo("item_2"));
+            Assert.That(item3.ItemId, Is.EqualTo("item_3"));
+        });
+    }
 }

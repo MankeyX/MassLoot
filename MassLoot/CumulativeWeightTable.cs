@@ -75,4 +75,18 @@ public class CumulativeWeightTable
             ? index
             : _cumulativeWeights.Count - 1;
     }
+
+    /// <summary>
+    /// Get the cumulative weight of <paramref name="index"/> - 1
+    /// </summary>
+    public double GetCumulativeWeightBefore(int index)
+        => index == 0
+            ? 0d
+            : _cumulativeWeights[index - 1];
+
+    /// <summary>
+    /// Get the total weight of all items in the table.
+    /// </summary>
+    public double GetWeightOfTable()
+        => _cumulativeWeights[^1];
 }

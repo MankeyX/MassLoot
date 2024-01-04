@@ -124,7 +124,30 @@ public class LootTable : ILootItem
     )
     {
         var index = _cumulativeWeightTable.SelectIndex(number);
-        return _loot[index];
+        var itemToDrop = _loot[index];
+
+        if (itemToDrop is LootTable table)
+        {
+            number = GetAdjustedNumberForNestedTable(number, index);
+
+            itemToDrop = table.Drop(number);
+        }
+
+        return itemToDrop;
+    }
+
+    private double GetAdjustedNumberForNestedTable(double number, int index)
+    {
+        var totalWeight = _cumulativeWeightTable.GetWeightOfTable();
+        var weightBefore = _cumulativeWeightTable.GetCumulativeWeightBefore(index);
+        var itemWeight = _loot[index].Weight;
+
+        // Calculate the start and end range of the number for the selected item
+        var startRange = weightBefore / totalWeight;
+        var endRange = (weightBefore + itemWeight) / totalWeight;
+
+        // Normalize the number to the range of the selected item in the nested loot table
+        return (number - startRange) / (endRange - startRange);
     }
 
     #region ILootItem
