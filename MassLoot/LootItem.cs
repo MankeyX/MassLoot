@@ -2,7 +2,7 @@ using MassLoot.Expressions;
 
 namespace MassLoot;
 
-public record LootItem
+public class LootItem : ILootItem
 {
     public string ItemId { get; }
 
@@ -26,22 +26,11 @@ public record LootItem
     public bool HasVariables
         => _expression.HasVariables;
 
-    /// <summary>
-    /// Get the variables used in the weight expression.
-    /// </summary>
-    /// <returns>
-    /// The variables used in the weight expression.
-    /// </returns>
+    /// <inheritdoc />
     public IEnumerable<string> GetVariables()
         => _expression.GetVariables();
 
-    /// <summary>
-    /// Calculate the weight of the item.
-    /// The weight can then be retrieved with the <see cref="Weight"/> property.
-    /// </summary>
-    /// <param name="variables">
-    /// The variables to be made available to the expression.
-    /// </param>
+    /// <inheritdoc />
     public void Calculate(
         IReadOnlyDictionary<string, double> variables
     ) =>

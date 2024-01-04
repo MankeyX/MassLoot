@@ -5,7 +5,7 @@ public class CumulativeWeightTable
     private readonly List<double> _cumulativeWeights;
 
     public CumulativeWeightTable(
-        IReadOnlyCollection<LootItem> loot
+        IReadOnlyCollection<ILootItem> loot
     )
     {
         if (loot.Count == 0)
@@ -37,7 +37,7 @@ public class CumulativeWeightTable
     /// </param>
     public void UpdateWeight(
         int index,
-        List<LootItem> lootItems
+        List<ILootItem> lootItems
     )
     {
         var cumulativeWeight = index == 0

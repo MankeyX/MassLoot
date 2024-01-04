@@ -21,7 +21,7 @@ public class LootTableTests
         var lootTable =
             new LootTable(
                 [
-                    new("item_1", "1")
+                    new LootItem("item_1", "1")
                 ],
                 new Dictionary<string, double>()
             );
@@ -37,8 +37,8 @@ public class LootTableTests
         var lootTable =
             new LootTable(
                 [
-                    new("item_1", "1"),
-                    new("item_2", "1 + test_var")
+                    new LootItem("item_1", "1"),
+                    new LootItem("item_2", "1 + test_var")
                 ],
                 new Dictionary<string, double>
                 {
@@ -64,8 +64,8 @@ public class LootTableTests
         var lootTable =
             new LootTable(
                 [
-                    new("item_1", "1"),
-                    new("item_2", "1")
+                    new LootItem("item_1", "1"),
+                    new LootItem("item_2", "1")
                 ],
                 new Dictionary<string, double>()
             );
@@ -88,8 +88,8 @@ public class LootTableTests
         var lootTable =
             new LootTable(
                 [
-                    new("item_1", "1 + test_var"),
-                    new("item_2", "1"),
+                    new LootItem("item_1", "1 + test_var"),
+                    new LootItem("item_2", "1"),
                 ],
                 new Dictionary<string, double>
                 {

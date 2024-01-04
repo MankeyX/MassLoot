@@ -1,15 +1,17 @@
+using MassLoot.Expressions;
+
 namespace MassLoot;
 
-public class LootTable
+public class LootTable : ILootItem
 {
-    private readonly List<LootItem> _loot;
+    private readonly List<ILootItem> _loot;
     private readonly Dictionary<string, double> _variables;
     private readonly Dictionary<string, List<int>> _variablesToLootItemIndexesMap
         = new();
     private readonly CumulativeWeightTable _cumulativeWeightTable;
 
     public LootTable(
-        IReadOnlyCollection<LootItem> loot,
+        IReadOnlyCollection<ILootItem> loot,
         IReadOnlyDictionary<string, double> variables
     )
     {
@@ -117,11 +119,47 @@ public class LootTable
     /// <returns>
     /// The item that was dropped.
     /// </returns>
-    public LootItem Drop(
+    public ILootItem Drop(
         double number
     )
     {
         var index = _cumulativeWeightTable.SelectIndex(number);
         return _loot[index];
     }
+
+    #region ILootItem
+
+    public string ItemId { get; }
+    public double Weight { get; private set; }
+
+    private readonly Expression _expression;
+
+    public LootTable(
+        string itemId,
+        string weightExpression,
+        IReadOnlyCollection<ILootItem> loot,
+        IReadOnlyDictionary<string, double> variables
+    ) : this(loot, variables)
+    {
+        ItemId = itemId;
+        _expression =
+            ExpressionParser.Parse(
+                weightExpression
+            );
+    }
+
+    public bool HasVariables
+        => _expression.HasVariables;
+
+    /// <inheritdoc />
+    public IEnumerable<string> GetVariables()
+        => _expression.GetVariables();
+
+    /// <inheritdoc />
+    public void Calculate(
+        IReadOnlyDictionary<string, double> variables
+    ) =>
+        Weight = _expression.Calculate(variables);
+
+    #endregion
 }
