@@ -34,13 +34,10 @@ public class CumulativeWeightTable
     }
 
     /// <summary>
-    /// Updates the cumulative weights starting from the specified index.
+    /// Re-initializes the cumulative weights with the specified loot items.
     /// </summary>
-    /// <param name="index">
-    /// The index to start updating the cumulative weights from.
-    /// </param>
     /// <param name="lootItems">
-    /// The loot items to update the cumulative weights with.
+    /// The loot items to use for the new cumulative weights.
     /// </param>
     public void UpdateWeight(
         IList<ILootItem> lootItems
