@@ -35,14 +35,13 @@ public class LootTable
 
     private void InitializeWeightTable()
     {
-        _currentLoot =
-            _loot
-                .Where(x => x.Weight > 0)
-                .ToList();
-
-        SortItemsByWeight();
+        FilterAndSortCurrentLoot();
 
         _cumulativeWeightTable = new CumulativeWeightTable(
+            _loot
+        );
+
+        _cumulativeWeightTable.UpdateWeight(
             _currentLoot
         );
     }
@@ -64,16 +63,6 @@ public class LootTable
         {
             lootItem.Calculate(_variables);
         }
-    }
-
-    /// <summary>
-    /// Sort the items in the table by their weight in ascending order.
-    /// </summary>
-    private void SortItemsByWeight()
-    {
-        _currentLoot.Sort(
-            (item, lootItem) => item.Weight.CompareTo(lootItem.Weight)
-        );
     }
 
     /// <summary>
@@ -130,11 +119,22 @@ public class LootTable
             _loot[index].Calculate(_variables);
         }
 
-        _currentLoot = _loot.Where(x => x.Weight > 0).ToList();
-        SortItemsByWeight();
+        FilterAndSortCurrentLoot();
         _cumulativeWeightTable.UpdateWeight(
             _currentLoot
         );
+    }
+
+    /// <summary>
+    /// Filter and sort the current loot based on the weight of the items.
+    /// </summary>
+    private void FilterAndSortCurrentLoot()
+    {
+        _currentLoot =
+            _loot
+                .Where(x => x.Weight > 0)
+                .OrderBy(x => x.Weight)
+                .ToList();
     }
 
     /// <summary>
