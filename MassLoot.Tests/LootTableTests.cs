@@ -8,11 +8,13 @@ public class LootTableTests
     public void EmptyTableThrowsException()
     {
         Assert.Throws<ArgumentException>(
-            () => new LootTable(
-                new List<LootItem>(),
-                new Dictionary<string, double>()
-            )
-        );
+            () =>
+            {
+                _ = new LootTable(
+                    new List<LootItem>(),
+                    new Dictionary<string, double>()
+                );
+            });
     }
 
     [Test]
@@ -190,5 +192,30 @@ public class LootTableTests
         var item2 = lootTable.Drop(5.00000001d);
 
         Assert.That(item2.Weight, Is.EqualTo(newVarValue));
+    }
+
+    [Test]
+    public void TableMadeUpOfZeroWeightItemsDropLootItemNone()
+    {
+        var lootTable =
+            new LootTable(
+                [
+                    new LootItem("i0", "magic_find")
+                ],
+                new Dictionary<string, double>
+                {
+                    { "magic_find", 0d }
+                }
+            );
+
+        var item1 = lootTable.Drop(0.000001d);
+
+        Assert.That(item1, Is.EqualTo(LootItem.None));
+
+        lootTable.UpdateVariable("magic_find", 1d);
+
+        item1 = lootTable.Drop(0.000001d);
+
+        Assert.That(item1, Is.Not.EqualTo(LootItem.None));
     }
 }

@@ -148,6 +148,12 @@ public class LootTable
     )
     {
         var index = _cumulativeWeightTable.SelectIndex(number);
+
+        if (index < 0)
+        {
+            return LootItem.None;
+        }
+
         var itemToDrop = _currentLoot[index];
 
         return itemToDrop;

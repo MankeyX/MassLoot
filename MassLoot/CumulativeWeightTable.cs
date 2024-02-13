@@ -59,6 +59,11 @@ public class CumulativeWeightTable
         double number
     )
     {
+        if (_cumulativeWeights.Count == 0)
+        {
+            return -1;
+        }
+
         number *= _cumulativeWeights[^1];
 
         var index = _cumulativeWeights.BinarySearch(number);
