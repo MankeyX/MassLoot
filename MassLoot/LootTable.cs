@@ -1,14 +1,14 @@
-using MassLoot.Expressions;
-
 namespace MassLoot;
 
-public class LootTable : ILootItem
+public class LootTable
 {
     private readonly List<ILootItem> _loot;
     private readonly Dictionary<string, double> _variables;
     private readonly Dictionary<string, List<int>> _variablesToLootItemIndexesMap
         = new();
-    private readonly CumulativeWeightTable _cumulativeWeightTable;
+    private CumulativeWeightTable _cumulativeWeightTable;
+
+    private List<ILootItem> _currentLoot;
 
     public LootTable(
         IReadOnlyCollection<ILootItem> loot,
@@ -30,16 +30,30 @@ public class LootTable : ILootItem
         CalculateWeights();
         LinkVariablesToLootItems();
 
-        _cumulativeWeightTable = new CumulativeWeightTable(loot);
+        InitializeWeightTable();
+    }
+
+    private void InitializeWeightTable()
+    {
+        _currentLoot =
+            _loot
+                .Where(x => x.Weight > 0)
+                .ToList();
+
+        SortItemsByWeight();
+
+        _cumulativeWeightTable = new CumulativeWeightTable(
+            _currentLoot
+        );
     }
 
     /// <summary>
     /// Sort the items in the table by whether they have variables or not.
     /// </summary>
     private void SortItemsByVariables()
-    {
-        _loot.Sort((item, _) => item.HasVariables ? 1 : 0);
-    }
+        => _loot.Sort(
+            (item, _) => item.HasVariables ? 1 : 0
+        );
 
     /// <summary>
     /// Calculate the weight of all items in the table.
@@ -50,6 +64,16 @@ public class LootTable : ILootItem
         {
             lootItem.Calculate(_variables);
         }
+    }
+
+    /// <summary>
+    /// Sort the items in the table by their weight in ascending order.
+    /// </summary>
+    private void SortItemsByWeight()
+    {
+        _currentLoot.Sort(
+            (item, lootItem) => item.Weight.CompareTo(lootItem.Weight)
+        );
     }
 
     /// <summary>
@@ -106,10 +130,10 @@ public class LootTable : ILootItem
             _loot[index].Calculate(_variables);
         }
 
-        var firstIndex = lootItemIndexes.First();
+        _currentLoot = _loot.Where(x => x.Weight > 0).ToList();
+        SortItemsByWeight();
         _cumulativeWeightTable.UpdateWeight(
-            firstIndex,
-            _loot
+            _currentLoot
         );
     }
 
@@ -124,65 +148,8 @@ public class LootTable : ILootItem
     )
     {
         var index = _cumulativeWeightTable.SelectIndex(number);
-        var itemToDrop = _loot[index];
-
-        if (itemToDrop is LootTable table)
-        {
-            number = GetAdjustedNumberForNestedTable(number, index);
-
-            itemToDrop = table.Drop(number);
-        }
+        var itemToDrop = _currentLoot[index];
 
         return itemToDrop;
     }
-
-    private double GetAdjustedNumberForNestedTable(double number, int index)
-    {
-        var totalWeight = _cumulativeWeightTable.GetWeightOfTable();
-        var weightBefore = _cumulativeWeightTable.GetCumulativeWeightBefore(index);
-        var itemWeight = _loot[index].Weight;
-
-        // Calculate the start and end range of the number for the selected item
-        var startRange = weightBefore / totalWeight;
-        var endRange = (weightBefore + itemWeight) / totalWeight;
-
-        // Normalize the number to the range of the selected item in the nested loot table
-        return (number - startRange) / (endRange - startRange);
-    }
-
-    #region ILootItem
-
-    public string ItemId { get; }
-    public double Weight { get; private set; }
-
-    private readonly Expression _expression;
-
-    public LootTable(
-        string itemId,
-        string weightExpression,
-        IReadOnlyCollection<ILootItem> loot,
-        IReadOnlyDictionary<string, double> variables
-    ) : this(loot, variables)
-    {
-        ItemId = itemId;
-        _expression =
-            ExpressionParser.Parse(
-                weightExpression
-            );
-    }
-
-    public bool HasVariables
-        => _expression.HasVariables;
-
-    /// <inheritdoc />
-    public IEnumerable<string> GetVariables()
-        => _expression.GetVariables();
-
-    /// <inheritdoc />
-    public void Calculate(
-        IReadOnlyDictionary<string, double> variables
-    ) =>
-        Weight = _expression.Calculate(variables);
-
-    #endregion
 }

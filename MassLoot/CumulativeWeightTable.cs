@@ -2,7 +2,7 @@ namespace MassLoot;
 
 public class CumulativeWeightTable
 {
-    private readonly List<double> _cumulativeWeights;
+    private List<double> _cumulativeWeights;
 
     public CumulativeWeightTable(
         IReadOnlyCollection<ILootItem> loot
@@ -18,6 +18,13 @@ public class CumulativeWeightTable
 
         _cumulativeWeights = new List<double>(loot.Count);
 
+        InitializeTable(loot);
+    }
+
+    private void InitializeTable(
+        IEnumerable<ILootItem> loot
+    )
+    {
         var cumulativeWeight = 0d;
         foreach (var item in loot)
         {
@@ -36,21 +43,13 @@ public class CumulativeWeightTable
     /// The loot items to update the cumulative weights with.
     /// </param>
     public void UpdateWeight(
-        int index,
-        List<ILootItem> lootItems
+        IList<ILootItem> lootItems
     )
     {
-        var cumulativeWeight = index == 0
-            ? 0d
-            : _cumulativeWeights[index - 1];
-
-        do
-        {
-            cumulativeWeight += lootItems[index].Weight;
-            _cumulativeWeights[index] = cumulativeWeight;
-            index++;
-        }
-        while (index < lootItems.Count);
+        _cumulativeWeights = new List<double>(lootItems.Count);
+        InitializeTable(
+            lootItems
+        );
     }
 
     /// <summary>
@@ -75,18 +74,4 @@ public class CumulativeWeightTable
             ? index
             : _cumulativeWeights.Count - 1;
     }
-
-    /// <summary>
-    /// Get the cumulative weight of <paramref name="index"/> - 1
-    /// </summary>
-    public double GetCumulativeWeightBefore(int index)
-        => index == 0
-            ? 0d
-            : _cumulativeWeights[index - 1];
-
-    /// <summary>
-    /// Get the total weight of all items in the table.
-    /// </summary>
-    public double GetWeightOfTable()
-        => _cumulativeWeights[^1];
 }

@@ -106,47 +106,89 @@ public class LootTableTests
     }
 
     [Test]
-    public void EmptyTableAsLootItemThrowsException()
-    {
-        Assert.Throws<ArgumentException>(
-            () => new LootTable(
-                string.Empty,
-                "4+4",
-                new List<LootItem>(),
-                new Dictionary<string, double>()
-            )
-        );
-    }
-
-    [Test]
-    public void DropItemFromNestedLootTable()
+    public void DontDropItemWithZeroWeight()
     {
         var lootTable =
             new LootTable(
                 [
-                    new LootItem("item_1", "1"),
-                    new LootTable(
-                        "table_2",
-                        "1",
-                        [
-                            new LootItem("item_2", "1"),
-                            new LootItem("item_3", "1")
-                        ],
-                        new Dictionary<string, double>()
-                    )
+                    new LootItem("item_1", "0"),
+                    new LootItem("item_2", "1"),
+                    new LootItem("item_3", "1")
                 ],
                 new Dictionary<string, double>()
             );
 
-        var item1 = lootTable.Drop(0.49d);
-        var item2 = lootTable.Drop(0.51d);
-        var item3 = lootTable.Drop(0.76d);
+        var item1 = lootTable.Drop(0d);
+        var item2 = lootTable.Drop(0.50000001d);
+        var item3 = lootTable.Drop(0.7d);
 
         Assert.Multiple(() =>
         {
-            Assert.That(item1.ItemId, Is.EqualTo("item_1"));
-            Assert.That(item2.ItemId, Is.EqualTo("item_2"));
+            Assert.That(item1.ItemId, Is.EqualTo("item_2"));
+            Assert.That(item2.ItemId, Is.EqualTo("item_3"));
             Assert.That(item3.ItemId, Is.EqualTo("item_3"));
         });
+    }
+
+    [Test]
+    public void DontDropItemWithZeroWeightAfterUpdatingVariable()
+    {
+        var lootTable =
+            new LootTable(
+                [
+                    new LootItem("w0", "0"),
+                    new LootItem("w1", "1 + test_var"),
+                    new LootItem("w1", "5")
+                ],
+                new Dictionary<string, double>
+                {
+                    { "test_var", 0d }
+                }
+            );
+
+        var item1 = lootTable.Drop(0d);
+        var item2 = lootTable.Drop(0.7d);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(item1.Weight, Is.EqualTo(1d));
+            Assert.That(item2.Weight, Is.EqualTo(5d));
+        });
+
+        lootTable.UpdateVariable("test_var", -1d);
+
+        var item3 = lootTable.Drop(0d);
+
+        Assert.That(item3.Weight, Is.EqualTo(5d));
+    }
+
+    [Test]
+    public void ZeroWeightItemIsDroppedAfterBeingUpdated()
+    {
+        var lootTable =
+            new LootTable(
+                [
+                    new LootItem("i0", "magic_find"),
+                    new LootItem("i1", "5")
+                ],
+                new Dictionary<string, double>
+                {
+                    { "magic_find", 0d }
+                }
+            );
+
+        var item1 = lootTable.Drop(0.000001d);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(item1.Weight, Is.EqualTo(5d));
+        });
+
+        const double newVarValue = 167d;
+        lootTable.UpdateVariable("magic_find", newVarValue);
+
+        var item2 = lootTable.Drop(5.00000001d);
+
+        Assert.That(item2.Weight, Is.EqualTo(newVarValue));
     }
 }
