@@ -6,9 +6,8 @@ public class LootTable
     private readonly Dictionary<string, double> _variables;
     private readonly Dictionary<string, List<int>> _variablesToLootItemIndexesMap
         = new();
-    private CumulativeWeightTable _cumulativeWeightTable;
 
-    private List<ILootItem> _currentLoot;
+    private readonly FenwickTree _fenwickTree;
 
     public LootTable(
         IReadOnlyCollection<ILootItem> loot,
@@ -25,25 +24,16 @@ public class LootTable
 
         _loot = loot.ToList();
         _variables = variables.ToDictionary();
+        _fenwickTree = new FenwickTree(_loot.Count);
 
         SortItemsByVariables();
         CalculateWeights();
         LinkVariablesToLootItems();
 
-        InitializeWeightTable();
-    }
-
-    private void InitializeWeightTable()
-    {
-        FilterAndSortCurrentLoot();
-
-        _cumulativeWeightTable = new CumulativeWeightTable(
-            _loot
-        );
-
-        _cumulativeWeightTable.UpdateWeight(
-            _currentLoot
-        );
+        for (var i = 0; i < _loot.Count; i++)
+        {
+            _fenwickTree.Update(i, _loot[i].Weight);
+        }
     }
 
     /// <summary>
@@ -117,24 +107,8 @@ public class LootTable
         foreach (var index in lootItemIndexes)
         {
             _loot[index].Calculate(_variables);
+            _fenwickTree.Update(index, _loot[index].Weight);
         }
-
-        FilterAndSortCurrentLoot();
-        _cumulativeWeightTable.UpdateWeight(
-            _currentLoot
-        );
-    }
-
-    /// <summary>
-    /// Filter and sort the current loot based on the weight of the items.
-    /// </summary>
-    private void FilterAndSortCurrentLoot()
-    {
-        _currentLoot =
-            _loot
-                .Where(x => x.Weight > 0)
-                .OrderBy(x => x.Weight)
-                .ToList();
     }
 
     /// <summary>
@@ -147,14 +121,14 @@ public class LootTable
         double number
     )
     {
-        var index = _cumulativeWeightTable.SelectIndex(number);
+        var index = _fenwickTree.SearchIndex(number);
 
         if (index < 0)
         {
             return LootItem.None;
         }
 
-        var itemToDrop = _currentLoot[index];
+        var itemToDrop = _loot[index];
 
         return itemToDrop;
     }
