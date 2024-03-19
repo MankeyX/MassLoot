@@ -7,7 +7,7 @@ public class LootTable
     private readonly Dictionary<string, List<int>> _variablesToLootItemIndexesMap
         = new();
 
-    private readonly FenwickTree _fenwickTree;
+    private readonly BinaryIndexedWeightTable _binaryIndexedWeightTable;
 
     public LootTable(
         IReadOnlyCollection<ILootItem> loot,
@@ -24,7 +24,7 @@ public class LootTable
 
         _loot = loot.ToList();
         _variables = variables.ToDictionary();
-        _fenwickTree = new FenwickTree(_loot.Count);
+        _binaryIndexedWeightTable = new BinaryIndexedWeightTable(_loot.Count);
 
         SortItemsByVariables();
         CalculateWeights();
@@ -32,7 +32,7 @@ public class LootTable
 
         for (var i = 0; i < _loot.Count; i++)
         {
-            _fenwickTree.Update(i, _loot[i].Weight);
+            _binaryIndexedWeightTable.Update(i, _loot[i].Weight);
         }
     }
 
@@ -107,7 +107,7 @@ public class LootTable
         foreach (var index in lootItemIndexes)
         {
             _loot[index].Calculate(_variables);
-            _fenwickTree.Update(index, _loot[index].Weight);
+            _binaryIndexedWeightTable.Update(index, _loot[index].Weight);
         }
     }
 
@@ -121,7 +121,7 @@ public class LootTable
         double number
     )
     {
-        var index = _fenwickTree.SearchIndex(number);
+        var index = _binaryIndexedWeightTable.SearchIndex(number);
 
         if (index < 0)
         {

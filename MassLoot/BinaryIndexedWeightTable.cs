@@ -1,6 +1,6 @@
 namespace MassLoot;
 
-public class FenwickTree(int size)
+public class BinaryIndexedWeightTable(int size)
 {
     private readonly double[] _values = new double[size + 1];
     private readonly double[] _tree = new double[size + 1];
