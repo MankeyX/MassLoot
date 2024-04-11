@@ -2,15 +2,15 @@ namespace MassLoot;
 
 public class LootTable
 {
-    private readonly List<ILootItem> _loot;
+    private readonly IReadOnlyList<ILootItem> _loot;
     private readonly Dictionary<string, double> _variables;
     private readonly Dictionary<string, List<int>> _variablesToLootItemIndexesMap
         = new();
 
-    private readonly BinaryIndexedWeightTable _binaryIndexedWeightTable;
+    private readonly IWeightTable _weightTable;
 
     public LootTable(
-        IReadOnlyCollection<ILootItem> loot,
+        IReadOnlyList<ILootItem> loot,
         IReadOnlyDictionary<string, double> variables
     )
     {
@@ -22,27 +22,14 @@ public class LootTable
             );
         }
 
-        _loot = loot.ToList();
+        _loot = loot.OrderBy(x => x.HasVariables).ToList();
         _variables = variables.ToDictionary();
-        _binaryIndexedWeightTable = new BinaryIndexedWeightTable(_loot.Count);
 
-        SortItemsByVariables();
         CalculateWeights();
         LinkVariablesToLootItems();
 
-        for (var i = 0; i < _loot.Count; i++)
-        {
-            _binaryIndexedWeightTable.Update(i, _loot[i].Weight);
-        }
+        _weightTable = new BinaryIndexedWeightTable(_loot);
     }
-
-    /// <summary>
-    /// Sort the items in the table by whether they have variables or not.
-    /// </summary>
-    private void SortItemsByVariables()
-        => _loot.Sort(
-            (item, _) => item.HasVariables ? 1 : 0
-        );
 
     /// <summary>
     /// Calculate the weight of all items in the table.
@@ -107,7 +94,7 @@ public class LootTable
         foreach (var index in lootItemIndexes)
         {
             _loot[index].Calculate(_variables);
-            _binaryIndexedWeightTable.Update(index, _loot[index].Weight);
+            _weightTable.Update(index, _loot[index].Weight);
         }
     }
 
@@ -121,7 +108,7 @@ public class LootTable
         double number
     )
     {
-        var index = _binaryIndexedWeightTable.SearchIndex(number);
+        var index = _weightTable.SelectIndex(number);
 
         if (index < 0)
         {

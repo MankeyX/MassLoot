@@ -1,37 +1,48 @@
 namespace MassLoot;
 
-public class BinaryIndexedWeightTable(int size)
+/// <summary>
+/// A weight table that uses a binary indexed tree to update and select indexes.
+/// </summary>
+public class BinaryIndexedWeightTable : IWeightTable
 {
-    private readonly double[] _values = new double[size + 1];
-    private readonly double[] _tree = new double[size + 1];
+    private readonly double[] _values;
+    private readonly double[] _tree;
 
+    public BinaryIndexedWeightTable(
+        IReadOnlyList<ILootItem> weights
+    )
+    {
+        _values = new double[weights.Count + 1];
+        _tree = new double[weights.Count + 1];
+
+        for (var i = 0; i < weights.Count; i++)
+        {
+            Update(i, weights[i].Weight);
+        }
+    }
+
+    /// <inheritdoc cref="IWeightTable.Update" />
     public void Update(
         int index,
-        double value
+        double weight
     )
     {
         index++;
-        var initialIndex = index;
-        var initialValue = _values[index];
 
-        var delta = value - _values[index];
-        _values[index] = value;
+        var delta = weight - _values[index];
+        _values[index] = weight;
 
         while (index < _tree.Length)
         {
-            if (index == initialIndex && delta + initialValue == 0)
-            {
-                _tree[index] = 0;
-            }
-            else
-            {
-                _tree[index] += delta;
-            }
+            _tree[index] += delta;
             index += index & -index;
         }
     }
 
-    public double PrefixSum(
+    /// <summary>
+    /// Returns the prefix sum up to the specified index.
+    /// </summary>
+    private double PrefixSum(
         int index
     )
     {
@@ -46,7 +57,8 @@ public class BinaryIndexedWeightTable(int size)
         return sum;
     }
 
-    public int SearchIndex(
+    /// <inheritdoc cref="IWeightTable.SelectIndex" />
+    public int SelectIndex(
         double value
     )
     {
