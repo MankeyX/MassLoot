@@ -1,4 +1,6 @@
 using System.Text.RegularExpressions;
+using MassLoot.Utilities;
+using static MassLoot.Utilities.UnionExtensions;
 
 namespace MassLoot.Expressions;
 
@@ -21,75 +23,74 @@ internal static partial class ExpressionParser
     /// The expression to parse.
     /// </param>
     /// <returns>
-    /// The parsed expression.
+    /// The parsed expression or validation errors describing why parsing failed.
     /// </returns>
-    /// <exception cref="InvalidExpressionException">
-    /// Thrown when the expression cannot be parsed.
-    /// </exception>
-    public static Expression Parse(string expression)
+    public static Union<ValidationError[], Expression> Parse(string expression)
+        => Tokenize(expression)
+            .Validate()
+            .Match(
+                Left<ValidationError[], Expression>,
+                InternalParse
+            );
+
+    /// <summary>
+    /// Parse the tokens and return the expression.
+    /// </summary>
+    private static Union<ValidationError[], Expression> InternalParse(
+        ExpressionTokens tokens
+    )
     {
         var operators = new Stack<ExpressionToken>();
         var output = new Stack<ExpressionToken>();
 
-        var tokens = Tokenize(expression);
-
-        if (tokens.Validate(out var errors))
+        foreach (var token in tokens)
         {
-            foreach (var token in tokens)
+            if (token.IsOperator(out var @operator))
             {
-                if (token.IsOperator(out var @operator))
+                switch (@operator)
                 {
-                    switch (@operator)
-                    {
-                        case Operator.OpenParenthesis:
-                            operators.Push(token);
-                            break;
-                        case Operator.ClosingParenthesis:
-                            while (operators.Peek().IsOperator(out var op) &&
-                                   op != Operator.OpenParenthesis)
+                    case Operator.OpenParenthesis:
+                        operators.Push(token);
+                        break;
+                    case Operator.ClosingParenthesis:
+                        while (operators.Peek().IsOperator(out var op) &&
+                               op != Operator.OpenParenthesis)
+                        {
+                            var operatorValue = operators.Pop();
+                            if (operatorValue.Operator != Operator.OpenParenthesis &&
+                                operatorValue.Operator != Operator.ClosingParenthesis)
                             {
-                                var operatorValue = operators.Pop();
-                                if (operatorValue.Operator != Operator.OpenParenthesis &&
-                                    operatorValue.Operator != Operator.ClosingParenthesis)
-                                {
-                                    output.Push(operatorValue);
-                                }
+                                output.Push(operatorValue);
                             }
-                            operators.Pop();
-                            break;
-                        default:
-                            // Does op have a higher precedence than token[0]?
-                            if (operators.TryPeek(out var opToken) &&
-                                OrderOfOperations.TryGetValue(opToken.Operator, out var op1Precedence) &&
-                                OrderOfOperations.TryGetValue(@operator, out var op2Precedence) &&
-                                op1Precedence >= op2Precedence)
-                            {
-                                operators.Pop();
-                                output.Push(opToken);
-                            }
+                        }
 
-                            operators.Push(token);
-                            break;
-                    }
-                }
-                else
-                {
-                    output.Push(token);
+                        operators.Pop();
+                        break;
+                    default:
+                        // Does op have a higher precedence than token[0]?
+                        if (operators.TryPeek(out var opToken) &&
+                            OrderOfOperations.TryGetValue(opToken.Operator, out var op1Precedence) &&
+                            OrderOfOperations.TryGetValue(@operator, out var op2Precedence) &&
+                            op1Precedence >= op2Precedence)
+                        {
+                            operators.Pop();
+                            output.Push(opToken);
+                        }
+
+                        operators.Push(token);
+                        break;
                 }
             }
-
-            while (operators.Count > 0)
+            else
             {
-                var op = operators.Pop();
-                output.Push(op);
+                output.Push(token);
             }
         }
-        else
+
+        while (operators.Count > 0)
         {
-            throw new InvalidExpressionException(
-                string.Join("\\n", errors.Select(x => x.Message)),
-                errors
-            );
+            var op = operators.Pop();
+            output.Push(op);
         }
 
         return new Expression(

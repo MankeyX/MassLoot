@@ -1,3 +1,4 @@
+using MassLoot.Utilities;
 using NUnit.Framework;
 
 namespace MassLoot.Expressions.Tests;
@@ -18,12 +19,15 @@ public class ExpressionTests
         double expectedResult
     )
     {
-        var expression = ExpressionParser.Parse(expressionToParse);
+        var result =
+            ExpressionParser.Parse(expressionToParse)
+                .Match(
+                    left => Assert.Fail(string.Join(", ", left.Select(x => x.Message))),
+                    right => right.Calculate()
+                );
 
         Assert.That(
-            expression.Calculate(
-                new Dictionary<string, double>()
-            ),
+            result,
             Is.EqualTo(expectedResult)
         );
     }
@@ -40,12 +44,15 @@ public class ExpressionTests
         double expectedResult
     )
     {
-        var expression = ExpressionParser.Parse(expressionToParse);
+        var result =
+            ExpressionParser.Parse(expressionToParse)
+                .Match(
+                    left => Assert.Fail(string.Join(", ", left.Select(x => x.Message))),
+                    right => right.Calculate()
+                );
 
         Assert.That(
-            expression.Calculate(
-                new Dictionary<string, double>()
-            ),
+            result,
             Is.EqualTo(expectedResult)
         );
     }
@@ -53,52 +60,16 @@ public class ExpressionTests
     [Test]
     public void CalculateThrowsVariableNotDefinedException()
     {
-        var expression = ExpressionParser.Parse("test_var");
+        var result =
+            ExpressionParser.Parse("test_var")
+                .Match(
+                    left => Assert.Fail(string.Join(", ", left.Select(x => x.Message))),
+                    right => right.Calculate()
+                );
 
-        Assert.Throws<VariableNotDefinedException>(
-            () => expression.Calculate(
-                new Dictionary<string, double>()
-            )
-        );
-    }
-
-    [Test]
-    public void CalculateThrowsNotEnoughOperandsException()
-    {
-        var expression =
-            new Expression(
-                new ExpressionTokens(
-                [
-                    new ExpressionToken("1"),
-                    new ExpressionToken("+")
-                ])
-            );
-
-        Assert.Throws<NotEnoughOperandsException>(
-            () => expression.Calculate(
-                new Dictionary<string, double>()
-            )
-        );
-    }
-
-    [Test]
-    public void CalculateThrowsMalformedExpressionException()
-    {
-        var expression =
-            new Expression(
-                new ExpressionTokens(
-                [
-                    new ExpressionToken("1"),
-                    new ExpressionToken("2"),
-                    new ExpressionToken("+"),
-                    new ExpressionToken("1")
-                ])
-            );
-
-        Assert.Throws<MalformedExpressionException>(
-            () => expression.Calculate(
-                new Dictionary<string, double>()
-            )
-        );
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.EqualTo(0));
+        });
     }
 }

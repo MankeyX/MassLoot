@@ -1,3 +1,4 @@
+using MassLoot.Utilities;
 using NUnit.Framework;
 
 namespace MassLoot.Expressions.Tests;
@@ -9,53 +10,48 @@ public class ExpressionTokensExtensionsTests
     [Test]
     public void ValidateReturnsTrueForValidExpression()
     {
-        var tokens =
+        var expressionTokens =
             new ExpressionTokens(
             [
                 new ExpressionToken("1"),
                 new ExpressionToken("+"),
                 new ExpressionToken("2")
-            ]);
-        Assert.Multiple(() =>
-        {
-            Assert.That(
-                tokens.Validate(out var errors),
-                Is.True
+            ])
+            .Validate()
+            .Match(
+                _ => Assert.Fail("Validation failed"),
+                right => right
             );
-            Assert.That(
-                errors,
-                Is.Empty
-            );
-        });
+
+        Assert.That(
+            string.Join("", expressionTokens.Select(x => x.Token)),
+            Is.EqualTo("1+2")
+        );
     }
 
     [Test]
     public void ValidateReturnsFalseForEmptyExpression()
     {
-        var tokens =
-            new ExpressionTokens(
-                []
-            );
+        var validationErrors =
+            new ExpressionTokens([])
+                .Validate()
+                .Match(
+                    left => left,
+                    _ => Assert.Fail("Validation passed when it should have failed")
+                );
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(
-                tokens.Validate(out var errors),
-                Is.False
-            );
-            Assert.That(
-                errors,
-                Is.Not.Empty.With.One.Items.Matches<ValidationError>(
-                    x => x.Message.Contains("An expression cannot be empty")
-                )
-            );
-        });
+        Assert.That(
+            validationErrors,
+            Has.One.Items.Matches<ValidationError>(
+                x => x.Type == ValidationErrorType.EmptyExpression
+            )
+        );
     }
 
     [Test]
     public void ValidateReturnsFalseForExpressionBeginningWithOperator()
     {
-        var tokens =
+        var validationErrors =
             new ExpressionTokens(
                 [
                     new ExpressionToken("+"),
@@ -63,27 +59,25 @@ public class ExpressionTokensExtensionsTests
                     new ExpressionToken("+"),
                     new ExpressionToken("2")
                 ]
+            )
+            .Validate()
+            .Match(
+                left => left,
+                _ => Assert.Fail("Validation passed when it should have failed")
             );
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(
-                tokens.Validate(out var errors),
-                Is.False
-            );
-            Assert.That(
-                errors,
-                Is.Not.Empty.With.One.Items.Matches<ValidationError>(
-                    x => x.Message.Contains("An expression cannot begin with an operator")
-                )
-            );
-        });
+        Assert.That(
+            validationErrors,
+            Has.One.Items.Matches<ValidationError>(
+                x => x.Type == ValidationErrorType.MalformedExpression
+            )
+        );
     }
 
     [Test]
     public void ValidateReturnsFalseForExpressionEndingWithOperator()
     {
-        var tokens =
+        var validationErrors =
             new ExpressionTokens(
                 [
                     new ExpressionToken("1"),
@@ -91,27 +85,25 @@ public class ExpressionTokensExtensionsTests
                     new ExpressionToken("2"),
                     new ExpressionToken("+")
                 ]
+            )
+            .Validate()
+            .Match(
+                left => left,
+                _ => Assert.Fail("Validation passed when it should have failed")
             );
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(
-                tokens.Validate(out var errors),
-                Is.False
-            );
-            Assert.That(
-                errors,
-                Is.Not.Empty.With.One.Items.Matches<ValidationError>(
-                    x => x.Message.Contains("An expression cannot end with an operator")
-                )
-            );
-        });
+        Assert.That(
+            validationErrors,
+            Has.One.Items.Matches<ValidationError>(
+                x => x.Type == ValidationErrorType.MalformedExpression
+            )
+        );
     }
 
     [Test]
     public void ValidateReturnsFalseForExpressionWithClosingParenthesisBeforeOpeningParenthesis()
     {
-        var tokens =
+        var validationErrors =
             new ExpressionTokens(
                 [
                     new ExpressionToken("1"),
@@ -120,27 +112,25 @@ public class ExpressionTokensExtensionsTests
                     new ExpressionToken("("),
                     new ExpressionToken("2")
                 ]
+            )
+            .Validate()
+            .Match(
+                left => left,
+                _ => Assert.Fail("Validation passed when it should have failed")
             );
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(
-                tokens.Validate(out var errors),
-                Is.False
-            );
-            Assert.That(
-                errors,
-                Is.Not.Empty.With.One.Items.Matches<ValidationError>(
-                    x => x.Message.Contains("Closing parenthesis cannot be used before opening parenthesis")
-                )
-            );
-        });
+        Assert.That(
+            validationErrors,
+            Has.One.Items.Matches<ValidationError>(
+                x => x.Type == ValidationErrorType.MalformedExpression
+            )
+        );
     }
 
     [Test]
     public void ValidateReturnsFalseForExpressionWithMismatchedParenthesis()
     {
-        var tokens =
+        var validationErrors =
             new ExpressionTokens(
                 [
                     new ExpressionToken("1"),
@@ -150,27 +140,25 @@ public class ExpressionTokensExtensionsTests
                     new ExpressionToken(")"),
                     new ExpressionToken(")")
                 ]
+            )
+            .Validate()
+            .Match(
+                left => left,
+                _ => Assert.Fail("Validation passed when it should have failed")
             );
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(
-                tokens.Validate(out var errors),
-                Is.False
-            );
-            Assert.That(
-                errors,
-                Is.Not.Empty.With.One.Items.Matches<ValidationError>(
-                    x => x.Message.Contains("Mismatched parenthesis")
-                )
-            );
-        });
+        Assert.That(
+            validationErrors,
+            Has.Exactly(2).Items.Matches<ValidationError>(
+                x => x.Type == ValidationErrorType.MalformedExpression
+            )
+        );
     }
 
     [Test]
     public void ValidateReturnsFalseForExpressionWithConsecutiveOperators()
     {
-        var tokens =
+        var validationErrors =
             new ExpressionTokens(
                 [
                     new ExpressionToken("1"),
@@ -178,27 +166,25 @@ public class ExpressionTokensExtensionsTests
                     new ExpressionToken("+"),
                     new ExpressionToken("2")
                 ]
+            )
+            .Validate()
+            .Match(
+                left => left,
+                _ => Assert.Fail("Validation passed when it should have failed")
             );
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(
-                tokens.Validate(out var errors),
-                Is.False
-            );
-            Assert.That(
-                errors,
-                Is.Not.Empty.With.One.Items.Matches<ValidationError>(
-                    x => x.Message.Contains("Consecutive operators")
-                )
-            );
-        });
+        Assert.That(
+            validationErrors,
+            Has.One.Items.Matches<ValidationError>(
+                x => x.Type == ValidationErrorType.MalformedExpression
+            )
+        );
     }
 
     [Test]
     public void ValidateReturnsFalseForExpressionWithMultipleErrors()
     {
-        var tokens =
+        var validationErrors =
             new ExpressionTokens(
                 [
                     new ExpressionToken("+"),
@@ -211,18 +197,18 @@ public class ExpressionTokensExtensionsTests
                     new ExpressionToken("+"),
                     new ExpressionToken("(")
                 ]
+            )
+            .Validate()
+            .Match(
+                left => left,
+                _ => Assert.Fail("Validation passed when it should have failed")
             );
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(
-                tokens.Validate(out var errors),
-                Is.False
-            );
-            Assert.That(
-                errors,
-                Is.Not.Empty.With.Exactly(5).Items
-            );
-        });
+        Assert.That(
+            validationErrors,
+            Has.Exactly(5).Items.Matches<ValidationError>(
+                x => x.Type == ValidationErrorType.MalformedExpression
+            )
+        );
     }
 }

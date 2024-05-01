@@ -1,5 +1,6 @@
 using System.Globalization;
 using MassLoot.Expressions;
+using MassLoot.Utilities;
 
 namespace MassLoot;
 
@@ -27,6 +28,9 @@ public class LootItem(
     private readonly Expression _expression =
         ExpressionParser.Parse(
             weightExpression
+        ).Match(
+            left => throw new ArgumentException(string.Join(", ", left.Select(x => x.Message))),
+            right => right
         );
 
     public bool HasVariables

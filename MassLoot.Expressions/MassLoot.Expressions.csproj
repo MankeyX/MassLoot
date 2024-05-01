@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\MassLoot.Utilities\MassLoot.Utilities.csproj" />
+    </ItemGroup>
+
 </Project>

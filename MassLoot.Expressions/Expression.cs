@@ -19,17 +19,8 @@ internal record Expression(
     /// <returns>
     /// The value of the expression.
     /// </returns>
-    /// <exception cref="NotEnoughOperandsException">
-    /// Thrown when there are not enough operands for an operator.
-    /// </exception>
-    /// <exception cref="VariableNotDefinedException">
-    /// Thrown when a variable is not defined in <paramref name="variables"/>.
-    /// </exception>
-    /// <exception cref="MalformedExpressionException">
-    /// Thrown when the expression is malformed.
-    /// </exception>
     public double Calculate(
-        IReadOnlyDictionary<string, double> variables
+        IReadOnlyDictionary<string, double>? variables = null
     )
     {
         var stack = new Stack<double>();
@@ -42,13 +33,6 @@ internal record Expression(
             }
             else if (token.IsOperator(out var operand))
             {
-                if (stack.Count < 2)
-                {
-                    throw new NotEnoughOperandsException(
-                        $"Not enough operands for operator {token}"
-                    );
-                }
-
                 var value2 = stack.Pop();
                 var value1 = stack.Pop();
                 stack.Push(
@@ -57,22 +41,16 @@ internal record Expression(
             }
             else if (token.IsVariable)
             {
-                if (!variables.TryGetValue(token.Token, out var value))
+                if (variables is not null &&
+                    variables.TryGetValue(token.Token, out var value))
                 {
-                    throw new VariableNotDefinedException(
-                        $"Variable '{token.Token}' is not defined"
-                    );
+                    stack.Push(value);
                 }
-
-                stack.Push(value);
+                else
+                {
+                    stack.Push(0);
+                }
             }
-        }
-
-        if (stack.Count != 1)
-        {
-            throw new MalformedExpressionException(
-                "The expression is malformed."
-            );
         }
 
         return stack.Pop();
@@ -91,7 +69,7 @@ internal record Expression(
             Operator.Multiply => op1 * op2,
             Operator.Divide => op1 / op2,
             Operator.Exponentiate => Math.Pow(op1, op2),
-            _ => throw new InvalidOperationException($"{token} is an invalid operator")
+            _ => op1
         };
     }
 
@@ -107,4 +85,4 @@ internal record Expression(
             .Where(token => token.IsVariable)
             .Select(token => token.Token);
     }
-};
+}
