@@ -48,4 +48,27 @@ public class SharedWeightTableTests
             Assert.That(item.Weight, Is.GreaterThan(0));
         });
     }
+
+    private static IEnumerable<IWeightTable> EmptyTableSource()
+    {
+        var biwt = new BinaryIndexedWeightTable();
+        biwt.Initialize(Array.Empty<IWeightedItem>());
+
+        yield return biwt;
+
+        var awt = new AliasWeightTable();
+        awt.Initialize(Array.Empty<IWeightedItem>());
+
+        yield return awt;
+    }
+
+    [TestCaseSource(nameof(EmptyTableSource))]
+    public void SelectIndex_SelectsNegativeIndex(
+        IWeightTable table
+    )
+    {
+        var index = table.SelectIndex(0.1d);
+
+        Assert.That(index, Is.EqualTo(-1));
+    }
 }
