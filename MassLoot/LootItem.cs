@@ -1,3 +1,4 @@
+using System.Globalization;
 using MassLoot.Expressions;
 
 namespace MassLoot;
@@ -7,7 +8,17 @@ public class LootItem(
     string weightExpression
 ) : ILootItem, IEquatable<LootItem>
 {
-    public static readonly LootItem None = new("None", "0");
+    /// <summary>
+    /// An item that represents nothing.
+    /// </summary>
+    public static readonly LootItem None
+        = Nothing(0);
+
+    /// <summary>
+    /// Create a loot item that represents nothing with the specified weight.
+    /// </summary>
+    public static LootItem Nothing(double weight)
+        => new("None", weight.ToString(CultureInfo.InvariantCulture));
 
     public string ItemId { get; } = itemId;
 
