@@ -1,5 +1,3 @@
-using MassLoot;
-
 namespace MassLoot.Tests;
 
 [TestFixture]
