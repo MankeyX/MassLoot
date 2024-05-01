@@ -1,4 +1,4 @@
-namespace MassLoot.Expressions;
+namespace MassLoot.Utilities;
 
 public record ValidationError(
     ValidationErrorType Type,
@@ -8,5 +8,6 @@ public record ValidationError(
 public enum ValidationErrorType
 {
     EmptyExpression,
-    MalformedExpression
+    MalformedExpression,
+    EmptyTable
 }

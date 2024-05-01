@@ -4,8 +4,10 @@ using static MassLoot.Utilities.UnionExtensions;
 
 namespace MassLoot;
 
-public class LootTable<TWeightTable>
-    where TWeightTable : IWeightTable
+public class LootTable<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+    TWeightTable
+> where TWeightTable : IWeightTable
 {
     private IReadOnlyList<ILootItem> _loot = null!;
     private Dictionary<string, double> _variables = null!;
@@ -24,7 +26,17 @@ public class LootTable<TWeightTable>
         Dictionary<string, double> variables
     )
     {
-        if (loot.Count == 0)
+        if (!loot.Any())
+        {
+            return new[]
+            {
+                new ValidationError(
+                    ValidationErrorType.EmptyTable,
+                    "The loot table must contain at least one item."
+                )
+            };
+        }
+
         _variables = variables;
 
         var validationErrors = InitializeItems(loot);
