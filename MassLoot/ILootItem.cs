@@ -13,9 +13,6 @@ public interface ILootItem : IWeightedItem
     /// <summary>
     /// Get the variables used in the weight expression.
     /// </summary>
-    /// <returns>
-    /// The variables used in the weight expression.
-    /// </returns>
     IEnumerable<string> GetVariables();
 
     /// <summary>
