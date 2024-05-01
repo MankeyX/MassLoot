@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassLoot.Expressions", "Mas
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassLoot.Tests", "MassLoot.Tests\MassLoot.Tests.csproj", "{1C14E884-B64D-434B-8863-A75B67AF283F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassLoot.Utilities", "MassLoot.Utilities\MassLoot.Utilities.csproj", "{D41BA57C-7364-4072-AB6E-6EF574C2F496}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{1C14E884-B64D-434B-8863-A75B67AF283F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C14E884-B64D-434B-8863-A75B67AF283F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C14E884-B64D-434B-8863-A75B67AF283F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D41BA57C-7364-4072-AB6E-6EF574C2F496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D41BA57C-7364-4072-AB6E-6EF574C2F496}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D41BA57C-7364-4072-AB6E-6EF574C2F496}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D41BA57C-7364-4072-AB6E-6EF574C2F496}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
