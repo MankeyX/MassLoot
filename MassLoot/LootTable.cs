@@ -1,47 +1,70 @@
+using System.Diagnostics.CodeAnalysis;
+using MassLoot.Utilities;
+using static MassLoot.Utilities.UnionExtensions;
+
 namespace MassLoot;
 
 public class LootTable<TWeightTable>
     where TWeightTable : IWeightTable
 {
-    private readonly IReadOnlyList<ILootItem> _loot;
-    private readonly Dictionary<string, double> _variables;
+    private IReadOnlyList<ILootItem> _loot = null!;
+    private Dictionary<string, double> _variables = null!;
     private readonly Dictionary<string, List<int>> _variablesToLootItemIndexesMap
         = new();
 
-    private readonly IWeightTable _weightTable;
+    private IWeightTable _weightTable = null!;
 
-    public LootTable(
+    private LootTable() { }
+
+    /// <summary>
+    /// Initialize all properties and item weights
+    /// </summary>
+    private Union<IEnumerable<ValidationError>, Unit> Initialize(
         IReadOnlyList<ILootItem> loot,
-        IReadOnlyDictionary<string, double> variables
+        Dictionary<string, double> variables
     )
     {
         if (loot.Count == 0)
+        _variables = variables;
+
+        var validationErrors = InitializeItems(loot);
+
+        if (validationErrors.Count > 0)
         {
-            throw new ArgumentException(
-                "You cannot create a loot table with zero items.",
-                nameof(loot)
-            );
+            return validationErrors;
         }
 
         _loot = loot.OrderBy(x => x.HasVariables).ToList();
-        _variables = variables.ToDictionary();
 
-        CalculateWeights();
+
         LinkVariablesToLootItems();
 
         _weightTable = Activator.CreateInstance<TWeightTable>();
         _weightTable.Initialize(_loot);
+
+        return Unit.Default;
     }
 
     /// <summary>
     /// Calculate the weight of all items in the table.
     /// </summary>
-    private void CalculateWeights()
+    /// <param name="loot"></param>
+    private List<ValidationError> InitializeItems(
+        IEnumerable<ILootItem> loot
+    )
     {
-        foreach (var lootItem in _loot)
+        var validationErrors = new List<ValidationError>();
+
+        foreach (var lootItem in loot)
         {
-            lootItem.Calculate(_variables);
+            lootItem.Initialize(_variables)
+                .Match(
+                    left => validationErrors.AddRange(left),
+                    _ => lootItem.Calculate(_variables)
+                );
         }
+
+        return validationErrors;
     }
 
     /// <summary>
@@ -112,13 +135,26 @@ public class LootTable<TWeightTable>
     {
         var index = _weightTable.SelectIndex(number);
 
-        if (index < 0)
-        {
-            return LootItem.None;
-        }
-
         var itemToDrop = _loot[index];
 
         return itemToDrop;
+    }
+
+    public static Union<IEnumerable<ValidationError>, LootTable<TWeightTable>> Create(
+        IReadOnlyList<ILootItem> loot,
+        Dictionary<string, double> variables
+    )
+    {
+        var lootTable =
+            new LootTable<TWeightTable>();
+
+        return
+            lootTable.Initialize(
+                loot,
+                variables
+            ).Match(
+                Left<IEnumerable<ValidationError>, LootTable<TWeightTable>>,
+                _ => Right<IEnumerable<ValidationError>, LootTable<TWeightTable>>(lootTable)
+            );
     }
 }

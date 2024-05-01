@@ -1,6 +1,7 @@
 using System.Globalization;
 using MassLoot.Expressions;
 using MassLoot.Utilities;
+using static MassLoot.Utilities.UnionExtensions;
 
 namespace MassLoot;
 
@@ -25,16 +26,34 @@ public class LootItem(
 
     public double Weight { get; private set; }
 
-    private readonly Expression _expression =
-        ExpressionParser.Parse(
-            weightExpression
-        ).Match(
-            left => throw new ArgumentException(string.Join(", ", left.Select(x => x.Message))),
-            right => right
-        );
+    private Expression _expression = null!;
 
     public bool HasVariables
         => _expression.HasVariables;
+
+    private bool _initialized;
+    /// <inheritdoc />
+    public Union<ValidationError[], Unit> Initialize(
+        IReadOnlyDictionary<string, double> variables
+    ) =>
+        ExpressionParser.Parse(
+            weightExpression
+        ).Match(
+            left => left,
+            right =>
+            {
+                if (_initialized)
+                {
+                    return Right<ValidationError[], Unit>(Unit.Default);
+                }
+
+                _expression = right;
+                Calculate(variables);
+                _initialized = true;
+
+                return Right<ValidationError[], Unit>(Unit.Default);
+            }
+        );
 
     /// <inheritdoc />
     public IEnumerable<string> GetVariables()

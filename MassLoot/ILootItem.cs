@@ -1,3 +1,5 @@
+using MassLoot.Utilities;
+
 namespace MassLoot;
 
 public interface IWeightedItem
@@ -14,6 +16,17 @@ public interface ILootItem : IWeightedItem
     /// Get the variables used in the weight expression.
     /// </summary>
     IEnumerable<string> GetVariables();
+
+    /// <summary>
+    /// Initialize the item and calculate the weight.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Union{T1,T2}"/> that contains any validation errors
+    /// or <see cref="Unit"/>.<see cref="Unit.Default"/> which indicates successful initialization.
+    /// </returns>
+    Union<ValidationError[], Unit> Initialize(
+        IReadOnlyDictionary<string, double> variables
+    );
 
     /// <summary>
     /// Calculate the weight of the item.
