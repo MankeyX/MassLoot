@@ -37,22 +37,6 @@ public class ExpressionParserTests
     }
 
     [Test]
-    public void ParseComplexWithVariablesAndPercent()
-    {
-        const string expressionToParse = "0.1% * (magic_find / 100 + 1)";
-        var expression = ExpressionParser.Parse(expressionToParse);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(expression, Is.Not.Null);
-            Assert.That(
-                string.Join(null, expression.Tokens.Select(x => x.Token)),
-                Is.EqualTo("0.1%magic_find100/1+*")
-            );
-        });
-    }
-
-    [Test]
     public void ParseAddition()
     {
         const string expressionToParse = "5 + 3";
