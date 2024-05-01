@@ -5,19 +5,20 @@ namespace MassLoot;
 /// </summary>
 public class BinaryIndexedWeightTable : IWeightTable
 {
-    private readonly double[] _values;
-    private readonly double[] _tree;
+    private double[] _values = null!;
+    private double[] _tree = null!;
 
-    public BinaryIndexedWeightTable(
-        IReadOnlyList<ILootItem> weights
+    /// <inheritdoc cref="IWeightTable.Initialize" />
+    public void Initialize(
+        IReadOnlyList<IWeightedItem> items
     )
     {
-        _values = new double[weights.Count + 1];
-        _tree = new double[weights.Count + 1];
+        _values = new double[items.Count + 1];
+        _tree = new double[items.Count + 1];
 
-        for (var i = 0; i < weights.Count; i++)
+        for (var i = 0; i < items.Count; i++)
         {
-            Update(i, weights[i].Weight);
+            Update(i, items[i].Weight);
         }
     }
 

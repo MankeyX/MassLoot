@@ -12,21 +12,15 @@ public class AliasWeightTable : IWeightTable
 
     private static readonly Random Random = new();
 
-    private readonly AliasNode[] _aliasTable;
+    private AliasNode[] _aliasTable = null!;
 
-    public AliasWeightTable(
-        IReadOnlyList<ILootItem> items
+    /// <inheritdoc cref="IWeightTable.Initialize" />
+    public void Initialize(
+        IReadOnlyList<IWeightedItem> items
     )
     {
         _aliasTable = new AliasNode[items.Count];
 
-        Initialize(items);
-    }
-
-    private void Initialize(
-        IReadOnlyList<ILootItem> items
-    )
-    {
         var sum = items.Sum(item => item.Weight);
         var small = new Stack<int>(items.Count);
         var large = new Stack<int>(items.Count);

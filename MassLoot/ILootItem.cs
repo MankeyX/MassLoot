@@ -1,9 +1,13 @@
 namespace MassLoot;
 
-public interface ILootItem
+public interface IWeightedItem
+{
+    double Weight { get; }
+}
+
+public interface ILootItem : IWeightedItem
 {
     string ItemId { get; }
-    double Weight { get; }
     bool HasVariables { get; }
 
     /// <summary>

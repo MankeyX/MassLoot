@@ -10,7 +10,7 @@ public class LootTableTests
         Assert.Throws<ArgumentException>(
             () =>
             {
-                _ = new LootTable(
+                _ = new LootTable<BinaryIndexedWeightTable>(
                     new List<LootItem>(),
                     new Dictionary<string, double>()
                 );
@@ -21,7 +21,7 @@ public class LootTableTests
     public void DropOneItem()
     {
         var lootTable =
-            new LootTable(
+            new LootTable<BinaryIndexedWeightTable>(
                 [
                     new LootItem("item_1", "1")
                 ],
@@ -37,7 +37,7 @@ public class LootTableTests
     public void DropOneItemAfterUpdatingVariable()
     {
         var lootTable =
-            new LootTable(
+            new LootTable<BinaryIndexedWeightTable>(
                 [
                     new LootItem("item_1", "1"),
                     new LootItem("item_2", "1 + test_var")
@@ -64,7 +64,7 @@ public class LootTableTests
     public void DropSameItemAfterUpdatingMissingVariable()
     {
         var lootTable =
-            new LootTable(
+            new LootTable<BinaryIndexedWeightTable>(
                 [
                     new LootItem("item_1", "1"),
                     new LootItem("item_2", "1")
@@ -88,7 +88,7 @@ public class LootTableTests
     public void DropSortedItemThatUsesVariables()
     {
         var lootTable =
-            new LootTable(
+            new LootTable<BinaryIndexedWeightTable>(
                 [
                     new LootItem("item_1", "1 + test_var"),
                     new LootItem("item_2", "1"),
@@ -111,7 +111,7 @@ public class LootTableTests
     public void DontDropItemWithZeroWeight()
     {
         var lootTable =
-            new LootTable(
+            new LootTable<BinaryIndexedWeightTable>(
                 [
                     new LootItem("item_1", "1"),
                     new LootItem("item_2", "1"),
@@ -136,7 +136,7 @@ public class LootTableTests
     public void DropItemWithZeroWeightAtBeginningOfTable()
     {
         var lootTable =
-            new LootTable(
+            new LootTable<BinaryIndexedWeightTable>(
                 [
                     new LootItem("item_1", "0"),
                     new LootItem("item_2", "1")
@@ -156,7 +156,7 @@ public class LootTableTests
     public void DontDropItemWithZeroWeightAfterUpdatingVariable()
     {
         var lootTable =
-            new LootTable(
+            new LootTable<BinaryIndexedWeightTable>(
                 [
                     new LootItem("w1", "1000 + test_var"),
                     new LootItem("w1", "5")
@@ -187,7 +187,7 @@ public class LootTableTests
     public void ZeroWeightItemIsDroppedAfterBeingUpdated()
     {
         var lootTable =
-            new LootTable(
+            new LootTable<BinaryIndexedWeightTable>(
                 [
                     new LootItem("i0", "magic_find"),
                     new LootItem("i1", "5")

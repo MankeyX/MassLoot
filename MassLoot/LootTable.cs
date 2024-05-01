@@ -1,6 +1,7 @@
 namespace MassLoot;
 
-public class LootTable
+public class LootTable<TWeightTable>
+    where TWeightTable : IWeightTable
 {
     private readonly IReadOnlyList<ILootItem> _loot;
     private readonly Dictionary<string, double> _variables;
@@ -28,7 +29,8 @@ public class LootTable
         CalculateWeights();
         LinkVariablesToLootItems();
 
-        _weightTable = new BinaryIndexedWeightTable(_loot);
+        _weightTable = Activator.CreateInstance<TWeightTable>();
+        _weightTable.Initialize(_loot);
     }
 
     /// <summary>

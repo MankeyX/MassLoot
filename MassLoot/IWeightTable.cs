@@ -3,6 +3,13 @@ namespace MassLoot;
 public interface IWeightTable
 {
     /// <summary>
+    /// Initializes the weight table with the specified items.
+    /// </summary>
+    void Initialize(
+        IReadOnlyList<IWeightedItem> items
+    );
+
+    /// <summary>
     /// Updates the weight at the specified index.
     /// </summary>
     void Update(
