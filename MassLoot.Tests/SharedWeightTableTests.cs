@@ -16,9 +16,7 @@ public class SharedWeightTableTests
     {
         foreach (var item in LootItems)
         {
-            item.Calculate(
-                new Dictionary<string, double>()
-            );
+            item.Initialize(new Dictionary<string, double>());
         }
 
         var biwt = new BinaryIndexedWeightTable();
