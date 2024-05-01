@@ -1,6 +1,6 @@
 namespace MassLoot.Expressions;
 
-public enum Operator
+internal enum Operator
 {
     None = ' ',
     Add = '+',
