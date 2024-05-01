@@ -63,6 +63,11 @@ public class BinaryIndexedWeightTable : IWeightTable
         double value
     )
     {
+        if (_tree.Length == 1)
+        {
+            return -1;
+        }
+
         var totalWeight = PrefixSum(_tree.Length - 2);
         var target = totalWeight * value;
 

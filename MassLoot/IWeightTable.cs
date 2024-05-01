@@ -20,6 +20,9 @@ public interface IWeightTable
     /// <summary>
     /// Selects the index of the item to drop based on the specified value.
     /// </summary>
+    /// <returns>
+    /// The index of the item to drop. A value of -1 indicates that no item was selected.
+    /// </returns>
     int SelectIndex(
         double value
     );

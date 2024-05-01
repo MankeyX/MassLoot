@@ -85,6 +85,11 @@ public class AliasWeightTable : IWeightTable
         double number
     )
     {
+        if (_aliasTable.Length == 0)
+        {
+            return -1;
+        }
+
         // Get a random index.
         var index = Random.Next(_aliasTable.Length);
 
