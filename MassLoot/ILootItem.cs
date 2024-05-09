@@ -2,6 +2,9 @@ using MassLoot.Utilities;
 
 namespace MassLoot;
 
+/// <summary>
+/// Represents an item that can be used in a <see cref="IWeightTable"/>.
+/// </summary>
 public interface IWeightedItem
 {
     double Weight { get; }

@@ -48,7 +48,6 @@ public class LootTable<
 
         _loot = loot.OrderBy(x => x.HasVariables).ToList();
 
-
         LinkVariablesToLootItems();
 
         _weightTable = Activator.CreateInstance<TWeightTable>();
