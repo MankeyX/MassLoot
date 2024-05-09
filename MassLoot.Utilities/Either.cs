@@ -1,95 +1,89 @@
 namespace MassLoot.Utilities;
 
-public sealed class Union<T1, T2>
+public sealed class Either<T1, T2>
 {
     public T1 Left { get; }
     public T2 Right { get; }
 
     public bool IsRight => Right is not null;
 
-    internal Union(T1 left)
+    internal Either(T1 left)
     {
         Left = left;
         Right = default!;
     }
 
-    internal Union(T2 right)
+    internal Either(T2 right)
     {
         Left = default!;
         Right = right;
     }
 
-    public static implicit operator Union<T1, T2>(T1 left)
+    public static implicit operator Either<T1, T2>(T1 left)
         => new(left);
-    public static implicit operator Union<T1, T2>(T2 right)
+    public static implicit operator Either<T1, T2>(T2 right)
         => new(right);
 }
 
-public static class UnionExtensions
+public static class EitherExtensions
 {
-    public static Union<T1, T2> Left<T1, T2>(T1 left)
+    public static Either<T1, T2> Left<T1, T2>(T1 left)
         => new(left);
-    public static Union<T1, T2> Right<T1, T2>(T2 right)
+    public static Either<T1, T2> Right<T1, T2>(T2 right)
         => new(right);
 
     public static TResult Match<T1, T2, TResult>(
-        this Union<T1, T2> union,
+        this Either<T1, T2> either,
         Func<T1, TResult> left,
         Func<T2, TResult> right
     )
-        => union.IsRight
-            ? right(union.Right)
-            : left(union.Left);
+        => either.IsRight
+            ? right(either.Right)
+            : left(either.Left);
 
     public static TResult Match<T1, T2, TResult>(
-        this Union<T1, T2> union,
+        this Either<T1, T2> either,
         Action<T1> left,
         Func<T2, TResult> right
     )
     {
-        if (union.IsRight)
+        if (either.IsRight)
         {
-            return right(union.Right);
-        }
-        else
-        {
-            left(union.Left);
+            return right(either.Right);
         }
 
+        left(either.Left);
         return default!;
     }
 
     public static TResult Match<T1, T2, TResult>(
-        this Union<T1, T2> union,
+        this Either<T1, T2> either,
         Func<T1, TResult> left,
         Action<T2> right
     )
     {
-        if (!union.IsRight)
+        if (!either.IsRight)
         {
-            return left(union.Left);
-        }
-        else
-        {
-            right(union.Right);
+            return left(either.Left);
         }
 
+        right(either.Right);
         return default!;
     }
 
     public static void Match<T1, T2>(
-        this Union<T1, T2> union,
+        this Either<T1, T2> either,
         Action<T1> left,
         Action<T2> right
     )
     {
-        if (!union.IsRight)
+        if (!either.IsRight)
         {
-            left(union.Left);
+            left(either.Left);
         }
         else
         {
-            right(union.Right);
+            right(either.Right);
         }
     }
 }

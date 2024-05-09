@@ -21,10 +21,10 @@ public interface ILootItem : IWeightedItem
     /// Initialize the item and calculate the weight.
     /// </summary>
     /// <returns>
-    /// A <see cref="Union{T1,T2}"/> that contains any validation errors
+    /// A <see cref="Either{T1,T2}"/> that contains any validation errors
     /// or <see cref="Unit"/>.<see cref="Unit.Default"/> which indicates successful initialization.
     /// </returns>
-    Union<ValidationError[], Unit> Initialize(
+    Either<ValidationError[], Unit> Initialize(
         IReadOnlyDictionary<string, double> variables
     );
 

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using MassLoot.Utilities;
-using static MassLoot.Utilities.UnionExtensions;
+using static MassLoot.Utilities.EitherExtensions;
 
 namespace MassLoot.Expressions;
 
@@ -25,7 +25,7 @@ internal static partial class ExpressionParser
     /// <returns>
     /// The parsed expression or validation errors describing why parsing failed.
     /// </returns>
-    public static Union<ValidationError[], Expression> Parse(string expression)
+    public static Either<ValidationError[], Expression> Parse(string expression)
         => Tokenize(expression)
             .Validate()
             .Match(
@@ -36,7 +36,7 @@ internal static partial class ExpressionParser
     /// <summary>
     /// Parse the tokens and return the expression.
     /// </summary>
-    private static Union<ValidationError[], Expression> InternalParse(
+    private static Either<ValidationError[], Expression> InternalParse(
         ExpressionTokens tokens
     )
     {

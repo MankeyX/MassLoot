@@ -1,7 +1,7 @@
 using System.Globalization;
 using MassLoot.Expressions;
 using MassLoot.Utilities;
-using static MassLoot.Utilities.UnionExtensions;
+using static MassLoot.Utilities.EitherExtensions;
 
 namespace MassLoot;
 
@@ -33,7 +33,7 @@ public class LootItem(
 
     private bool _initialized;
     /// <inheritdoc />
-    public Union<ValidationError[], Unit> Initialize(
+    public Either<ValidationError[], Unit> Initialize(
         IReadOnlyDictionary<string, double> variables
     ) =>
         ExpressionParser.Parse(

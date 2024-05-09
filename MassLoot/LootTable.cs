@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using MassLoot.Utilities;
-using static MassLoot.Utilities.UnionExtensions;
+using static MassLoot.Utilities.EitherExtensions;
 
 namespace MassLoot;
 
@@ -21,7 +21,7 @@ public class LootTable<
     /// <summary>
     /// Initialize all properties and item weights
     /// </summary>
-    private Union<IEnumerable<ValidationError>, Unit> Initialize(
+    private Either<IEnumerable<ValidationError>, Unit> Initialize(
         IReadOnlyList<ILootItem> loot,
         Dictionary<string, double> variables
     )
@@ -152,7 +152,7 @@ public class LootTable<
         return itemToDrop;
     }
 
-    public static Union<IEnumerable<ValidationError>, LootTable<TWeightTable>> Create(
+    public static Either<IEnumerable<ValidationError>, LootTable<TWeightTable>> Create(
         IReadOnlyList<ILootItem> loot,
         Dictionary<string, double> variables
     )

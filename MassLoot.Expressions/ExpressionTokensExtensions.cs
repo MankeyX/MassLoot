@@ -10,7 +10,7 @@ internal static class ExpressionTokensExtensions
     /// <returns>
     /// The expression tokens if they are valid; otherwise, an array of validation errors.
     /// </returns>
-    public static Union<ValidationError[], ExpressionTokens> Validate(
+    public static Either<ValidationError[], ExpressionTokens> Validate(
         this ExpressionTokens tokens
     )
     {
