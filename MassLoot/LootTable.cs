@@ -21,31 +21,63 @@ public class LootTable<
     /// <summary>
     /// Initialize all properties and item weights
     /// </summary>
-    private Either<IEnumerable<ValidationError>, Unit> Initialize(
+    private Either<List<ValidationError>, Unit> Initialize(
+        IReadOnlyList<ILootItem> loot,
+        Dictionary<string, double> variables
+    ) =>
+        Validate(loot)
+            .Bind(_ => ValidateAndInitializeItems(loot, variables))
+            .Map(_ => InitializeTable(loot, variables));
+
+    /// <summary>
+    /// Validate that the loot table will not be empty.
+    /// </summary>
+    private static Either<List<ValidationError>, Unit> Validate(
+        IReadOnlyList<ILootItem> loot
+    ) =>
+        !loot.Any()
+            ? new List<ValidationError>
+            {
+                new(
+                    ValidationErrorType.EmptyTable,
+                    "The loot table must contain at least one item."
+                )
+            }
+            : Unit.Default;
+
+    /// <summary>
+    /// Validate and calculate the weight of all items in the table.
+    /// </summary>
+    private static Either<List<ValidationError>, Unit> ValidateAndInitializeItems(
+        IEnumerable<ILootItem> loot,
+        IReadOnlyDictionary<string, double> variables
+    )
+    {
+        var validationErrors = new List<ValidationError>();
+
+        foreach (var lootItem in loot)
+        {
+            lootItem.Initialize(variables)
+                .Match(
+                    left => validationErrors.AddRange(left),
+                    _ => lootItem.Calculate(variables)
+                );
+        }
+
+        return validationErrors.Count > 0
+            ? validationErrors
+            : Unit.Default;
+    }
+
+    /// <summary>
+    /// Finish initializing the table.
+    /// </summary>
+    private Unit InitializeTable(
         IReadOnlyList<ILootItem> loot,
         Dictionary<string, double> variables
     )
     {
-        if (!loot.Any())
-        {
-            return new[]
-            {
-                new ValidationError(
-                    ValidationErrorType.EmptyTable,
-                    "The loot table must contain at least one item."
-                )
-            };
-        }
-
         _variables = variables;
-
-        var validationErrors = InitializeItems(loot);
-
-        if (validationErrors.Count > 0)
-        {
-            return validationErrors;
-        }
-
         _loot = loot.OrderBy(x => x.HasVariables).ToList();
 
         LinkVariablesToLootItems();
@@ -54,28 +86,6 @@ public class LootTable<
         _weightTable.Initialize(_loot);
 
         return Unit.Default;
-    }
-
-    /// <summary>
-    /// Calculate the weight of all items in the table.
-    /// </summary>
-    /// <param name="loot"></param>
-    private List<ValidationError> InitializeItems(
-        IEnumerable<ILootItem> loot
-    )
-    {
-        var validationErrors = new List<ValidationError>();
-
-        foreach (var lootItem in loot)
-        {
-            lootItem.Initialize(_variables)
-                .Match(
-                    left => validationErrors.AddRange(left),
-                    _ => lootItem.Calculate(_variables)
-                );
-        }
-
-        return validationErrors;
     }
 
     /// <summary>

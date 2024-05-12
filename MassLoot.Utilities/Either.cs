@@ -2,20 +2,22 @@ namespace MassLoot.Utilities;
 
 public sealed class Either<T1, T2>
 {
-    public T1 Left { get; }
-    public T2 Right { get; }
+    internal readonly T1 Left;
+    internal readonly T2 Right;
 
-    public bool IsRight => Right is not null;
+    public bool IsRight { get; }
 
     internal Either(T1 left)
     {
         Left = left;
+        IsRight = false;
         Right = default!;
     }
 
     internal Either(T2 right)
     {
         Left = default!;
+        IsRight = true;
         Right = right;
     }
 
@@ -86,4 +88,22 @@ public static class EitherExtensions
             right(either.Right);
         }
     }
+
+    public static Either<T1, TResult> Map<T1, T2, TResult>(
+        this Either<T1, T2> either,
+        Func<T2, TResult> map
+    ) =>
+        either.Match(
+            Left<T1, TResult>,
+            right => Right<T1, TResult>(map(right))
+        );
+
+    public static Either<T1, TResult> Bind<T1, T2, TResult>(
+        this Either<T1, T2> either,
+        Func<T2, Either<T1, TResult>> bind
+    ) =>
+        either.Match(
+            Left<T1, TResult>,
+            bind
+        );
 }
