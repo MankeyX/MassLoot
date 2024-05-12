@@ -3,7 +3,7 @@ using MassLoot.Utilities;
 namespace MassLoot.Tests;
 
 [TestFixture]
-[TestOf(typeof(LootTableTests))]
+[TestOf(typeof(LootTable<BinaryIndexedWeightTable>))]
 public class LootTableTests
 {
     [Test]
@@ -50,7 +50,7 @@ public class LootTableTests
         var lootTable =
             LootTable<BinaryIndexedWeightTable>.Create(
                 [
-                    new LootItem("item_1", "1")
+                    LootItem.Nothing(1)
                 ],
                 new Dictionary<string, double>()
             ).Match(
@@ -60,7 +60,7 @@ public class LootTableTests
 
         var result = lootTable.Drop(0.5d);
 
-        Assert.That(result.ItemId, Is.EqualTo("item_1"));
+        Assert.That(result.Weight, Is.EqualTo(1d));
     }
 
     [Test]
@@ -69,7 +69,7 @@ public class LootTableTests
         var lootTable =
             LootTable<BinaryIndexedWeightTable>.Create(
                 [
-                    new LootItem("item_1", "1"),
+                    LootItem.Nothing(1),
                     new LootItem("item_2", "1 + test_var")
                 ],
                 new Dictionary<string, double>
@@ -88,7 +88,7 @@ public class LootTableTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(item1.ItemId, Is.EqualTo("item_1"));
+            Assert.That(item1.ItemId, Is.EqualTo(LootItem.None.ItemId));
             Assert.That(item2.ItemId, Is.EqualTo("item_2"));
         });
     }
@@ -99,7 +99,7 @@ public class LootTableTests
         var lootTable =
             LootTable<BinaryIndexedWeightTable>.Create(
                 [
-                    new LootItem("item_1", "1"),
+                    LootItem.Nothing(1),
                     new LootItem("item_2", "1")
                 ],
                 new Dictionary<string, double>()
@@ -115,8 +115,8 @@ public class LootTableTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(item1.ItemId, Is.EqualTo("item_1"));
-            Assert.That(item2.ItemId, Is.EqualTo("item_1"));
+            Assert.That(item1.ItemId, Is.EqualTo(LootItem.None.ItemId));
+            Assert.That(item2.ItemId, Is.EqualTo(LootItem.None.ItemId));
         });
     }
 
@@ -127,7 +127,7 @@ public class LootTableTests
             LootTable<BinaryIndexedWeightTable>.Create(
                 [
                     new LootItem("item_1", "1 + test_var"),
-                    new LootItem("item_2", "1"),
+                    LootItem.Nothing(1),
                 ],
                 new Dictionary<string, double>
                 {
@@ -154,7 +154,7 @@ public class LootTableTests
                 [
                     new LootItem("item_1", "1"),
                     new LootItem("item_2", "1"),
-                    new LootItem("item_3", "0")
+                    LootItem.None
                 ],
                 new Dictionary<string, double>()
             ).Match(
@@ -180,7 +180,7 @@ public class LootTableTests
         var lootTable =
             LootTable<BinaryIndexedWeightTable>.Create(
                 [
-                    new LootItem("item_1", "0"),
+                    LootItem.None,
                     new LootItem("item_2", "1")
                 ],
                 new Dictionary<string, double>()
@@ -193,7 +193,7 @@ public class LootTableTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(item1.ItemId, Is.EqualTo("item_1"));
+            Assert.That(item1.ItemId, Is.EqualTo(LootItem.None.ItemId));
         });
     }
 
@@ -204,7 +204,7 @@ public class LootTableTests
             LootTable<BinaryIndexedWeightTable>.Create(
                 [
                     new LootItem("w1", "1000 + test_var"),
-                    new LootItem("w1", "5")
+                    LootItem.Nothing(5)
                 ],
                 new Dictionary<string, double>
                 {
@@ -238,7 +238,7 @@ public class LootTableTests
             LootTable<BinaryIndexedWeightTable>.Create(
                 [
                     new LootItem("i0", "magic_find"),
-                    new LootItem("i1", "5")
+                    LootItem.Nothing(5)
                 ],
                 new Dictionary<string, double>
                 {
