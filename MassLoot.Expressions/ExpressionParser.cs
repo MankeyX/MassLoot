@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using MassLoot.Utilities;
-using static MassLoot.Utilities.EitherExtensions;
+using static MassLoot.Utilities.Either;
 
 namespace MassLoot.Expressions;
 

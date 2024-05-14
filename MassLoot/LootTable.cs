@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using MassLoot.Utilities;
-using static MassLoot.Utilities.EitherExtensions;
+using static MassLoot.Utilities.Either;
 
 namespace MassLoot;
 

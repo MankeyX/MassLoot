@@ -27,13 +27,17 @@ public sealed class Either<T1, T2>
         => new(right);
 }
 
-public static class EitherExtensions
+public static class Either
 {
     public static Either<T1, T2> Left<T1, T2>(T1 left)
         => new(left);
+
     public static Either<T1, T2> Right<T1, T2>(T2 right)
         => new(right);
+}
 
+public static class EitherExtensions
+{
     public static TResult Match<T1, T2, TResult>(
         this Either<T1, T2> either,
         Func<T1, TResult> left,
@@ -94,8 +98,8 @@ public static class EitherExtensions
         Func<T2, TResult> map
     ) =>
         either.Match(
-            Left<T1, TResult>,
-            right => Right<T1, TResult>(map(right))
+            Either.Left<T1, TResult>,
+            right => Either.Right<T1, TResult>(map(right))
         );
 
     public static Either<T1, TResult> Bind<T1, T2, TResult>(
@@ -103,7 +107,7 @@ public static class EitherExtensions
         Func<T2, Either<T1, TResult>> bind
     ) =>
         either.Match(
-            Left<T1, TResult>,
+            Either.Left<T1, TResult>,
             bind
         );
 }
